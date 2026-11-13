@@ -11,6 +11,8 @@ export interface SocketOptions {
    * Never set this for Raiko servers, queued messages would skip the encryption check.
    */
   raw?: boolean
+  /** a WebSocket implementation for runtimes without one (Node 20: the ws package) */
+  WebSocket?: new (url: string, protocols?: string | string[]) => WebSocket
   protocols?: string | string[]
 }
 
@@ -43,7 +45,9 @@ export class RaikoClientSocket<In = unknown, Out = unknown> {
   }
 
   private connect() {
-    const ws = new WebSocket(this.url, this.o.protocols)
+    const Impl = this.o.WebSocket ?? (globalThis as { WebSocket?: typeof WebSocket }).WebSocket
+    if (!Impl) throw new Error('error[RK0902]: this runtime has no WebSocket client\n  = help: pass one, like new RaikoClientSocket(url, { WebSocket: (await import("ws")).WebSocket })')
+    const ws = new Impl(this.url, this.o.protocols)
     ws.binaryType = 'arraybuffer'
     this.ws = ws
     this.ready = false

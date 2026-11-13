@@ -4,6 +4,10 @@ import { Raiko, t } from '../../dist/index.js'
 import { RaikoClientSocket } from '../../dist/client/index.js'
 import { cors } from '../../dist/plugins/index.js'
 
+// Node 20 has no WebSocket client: use the ws package there (the server side needs nothing)
+const WS = globalThis.WebSocket ?? (await import('ws')).WebSocket
+const socket = (url) => new RaikoClientSocket(url, { WebSocket: WS })
+
 const app = new Raiko()
   .use(cors())
   .get('/', 'hello node')
@@ -28,15 +32,15 @@ try {
   assert.equal(await (await fetch(`${base}/stream`)).text(), 'data: 1\n\ndata: 2\n\n'); ok('sse')
   assert.equal((await fetch(base, { headers: { origin: 'https://x.io' } })).headers.get('access-control-allow-origin'), '*'); ok('cors')
 
-  const s = new RaikoClientSocket(`${ws}/ws`)
+  const s = socket(`${ws}/ws`)
   const p = s.next(); s.send({ hi: 1 })
   assert.deepEqual(await p, { echo: { hi: 1 } }); s.close(); ok('websocket')
 
-  const e = new RaikoClientSocket(`${ws}/enc`)
+  const e = socket(`${ws}/enc`)
   const pe = e.next(); e.send({ secret: 'x'.repeat(70000) })
   assert.deepEqual(await pe, { got: { secret: 'x'.repeat(70000) }, enc: true }); e.close(); ok('encrypted websocket, 64 bit frame length')
 
-  const a = new RaikoClientSocket(`${ws}/room`), b = new RaikoClientSocket(`${ws}/room`)
+  const a = socket(`${ws}/room`), b = socket(`${ws}/room`)
   await new Promise((r) => b.on('open', r)); await new Promise((r) => (a.isOpen ? r() : a.on('open', r)))
   const pb = b.next(); a.send('hey')
   assert.equal(await pb, 'hey'); a.close(); b.close(); ok('rooms')
