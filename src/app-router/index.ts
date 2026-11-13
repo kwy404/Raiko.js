@@ -221,8 +221,12 @@ export async function appRouter(options: AppRouterOptions = {}): Promise<Raiko> 
         const t0 = Date.now()
         const info = () => ({ route: seg.path, params, status: forced?.status ?? 200, ms: Date.now() - t0, layouts: seg.chain.filter((s) => s.files.layout).length, loading: !!loading, revalidate: page.revalidate ?? null, title: meta.title ?? null })
         if (hasSuspense(tree) || hasSuspense(content)) {
+          let shellHasVoodoo = false
           const stream = await renderStream(tree, {
-            transformShell: (h) => finishHtml(h, store, meta, dev ? info() : null),
+            transformShell: (h) => ((shellHasVoodoo = !!voodooSrc && VOODOO_RE.test(h)), finishHtml(h, store, meta, dev ? info() : null)),
+            // content that arrives after the shell can use Voodoo too: add the script once, at the end
+            onEnd: (streamedHtml) =>
+              voodooSrc && !shellHasVoodoo && VOODOO_RE.test(streamedHtml) ? `<script src="${voodooSrc}" defer></script>` : '',
             onError: async (e) => {
               if (process.env.NODE_ENV !== 'test') console.error(e)
               if (dev) return devOverlay(e as Error, ctx.request)

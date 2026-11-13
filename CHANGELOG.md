@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+- Fixed: interactive Voodoo.js content inside a page that streams (a `loading.tsx` above it) never got the Voodoo script, so `v-data` blocks stayed static and showed their raw text. The script is now added at the end of the stream when the streamed content needs it.
+- Every starter page has a counter that proves the page is interactive, written the way each framework does it: Voodoo.js in Raiko Pages, state in React, Preact, Vue and Svelte, signals in Solid and Angular.
+- The template test suite now opens each generated app in a real browser, clicks the counter and checks that the backend answers.
+
 ## 1.0.3
 
 - Fixed: with a routes manifest (the default in generated apps), files in `public/` were not served, so stylesheets, the favicon and page scripts returned 404. `public/` is now served whenever it exists.

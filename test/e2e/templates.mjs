@@ -83,6 +83,29 @@ for (const c of combos) {
         const r = await get(f)
         step(`GET ${f} ${r.status}`, { ok: r.status === 200, out: s.log() })
       }
+      // a real browser: no JavaScript errors, the counter reacts, Vite apps reach the API
+      if (process.env.BROWSER_CHECK) {
+        // async on purpose: a blocking call would stop this process from reading the server's
+        // log pipe, the pipe fills up and the server dies on its next write
+        const r = await new Promise((done) => {
+          // BROWSER_CHECK=native runs Playwright installed next to the tests (CI); a folder path runs it in Docker
+          const d = process.env.BROWSER_CHECK === 'native'
+            ? spawn('node', [join(process.cwd(), 'test/e2e/browsercheck.mjs'), s.url + '/'])
+            : spawn('docker', ['run', '--rm', '--network', 'host', '-v', `${process.env.BROWSER_CHECK}:/s`, '-v', `${process.env.PW_MODULES}:/s/node_modules:ro`, '-w', '/s', 'mcr.microsoft.com/playwright:v1.64.1-noble', 'node', 'browsercheck.mjs', s.url + '/'])
+          let stdout = '', stderr = ''
+          d.stdout.on('data', (x) => (stdout += x))
+          d.stderr.on('data', (x) => (stderr += x))
+          const t = setTimeout(() => d.kill(), 120000)
+          d.on('close', () => (clearTimeout(t), done({ stdout, stderr })))
+        })
+        let res = {}
+        try {
+          res = JSON.parse((r.stdout || '').trim().split('\n').pop())
+        } catch {}
+        const okCounter = /Clicked\s*2\s*times/.test(res.after || '')
+        const okStatus = vite ? /API says hello/.test(res.status || '') : /Server rendered/.test(res.status || '')
+        step(`browser: ${(res.after || 'no counter').replace(/\s+/g, ' ').trim()}, ${res.status || 'no status'}`, { ok: okCounter && okStatus && !(res.errors || []).length, out: JSON.stringify(res) + (r.stderr || '').slice(-800) })
+      }
       const docs = await get('/docs/json')
       step(`GET /docs/json ${docs.status}`, { ok: docs.status === 200, out: s.log() })
       const nf = await get('/definitely-missing', { headers: { accept: 'text/html' } })

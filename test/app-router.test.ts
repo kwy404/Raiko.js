@@ -167,3 +167,16 @@ describe('public folder with a manifest', () => {
     }
   })
 })
+
+describe('voodoo with streaming', () => {
+  it('adds the Voodoo script when interactive content arrives after the loading fallback', async () => {
+    const a = new Raiko().use(await appRouter({ dev: false, manifest: {
+      'loading.tsx': { default: () => jsx('p', { children: 'Loading...' }) },
+      'page.tsx': { default: async () => jsx('div', { 'v-data': '{ n: 0 }', children: jsx('button', { 'v-on:click': 'n++', children: 'go' }) }) },
+    } }))
+    const html = await (await a.request('/')).text()
+    expect(html.indexOf('Loading...')).toBeLessThan(html.indexOf('v-data'))
+    expect(html.match(/voodoo\.full\.min\.js/g)?.length).toBe(1)
+    expect(html.lastIndexOf('voodoo.full.min.js')).toBeGreaterThan(html.indexOf('v-data'))
+  })
+})

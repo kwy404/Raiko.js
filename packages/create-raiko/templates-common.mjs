@@ -1,6 +1,6 @@
 // Files shared by every frontend: config, database, auth, email, i18n, deploy.
 export const V = {
-  raiko: '^1.0.3', typescript: '5.6.3', bunTypes: '1.1.13', nodeTypes: '22.9.0', tsx: '4.19.2', esbuild: '0.24.0', vite: '5.4.11', terser: '5.36.0',
+  raiko: '^1.0.4', typescript: '5.6.3', bunTypes: '1.1.13', nodeTypes: '22.9.0', tsx: '4.19.2', esbuild: '0.24.0', vite: '5.4.11', terser: '5.36.0',
   kastor: '0.2.0', prisma: '5.22.0', drizzle: '0.38.3', drizzleKit: '0.30.1', betterSqlite: '11.7.0', pg: '8.13.1', postgresJs: '3.4.5',
   glyphfox: '1.3.0', lucide: '0.469.0', heroicons: '2.2.0', motion: '11.15.0', nodemailer: '6.9.16',
 }

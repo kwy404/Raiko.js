@@ -23,6 +23,7 @@ export const WELCOME_CSS = `/* Starter page. Delete this file and its import whe
 .rk-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden }
 .rk-card { background: var(--bg); padding: 16px 18px; text-decoration: none; color: var(--fg); display: block; transition: background .15s }
 .rk-card:hover { background: var(--soft) } .rk-card b { display: block; font-size: 14px; font-weight: 600 } .rk-card small { color: var(--muted); font-size: 13px }
+.rk-try { display: flex; align-items: center; gap: 12px; flex-wrap: wrap } .rk-try .rk-btn { height: 38px; padding: 0 16px; font-size: 14px; font-variant-numeric: tabular-nums } .rk-try small { color: var(--muted); font-size: 13px }
 .rk-status { display: flex; align-items: center; gap: 8px; font: 13px "Geist Mono", ui-monospace, monospace; color: var(--muted) }
 .rk-dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af } .rk-dot.ok { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,.18) } .rk-dot.bad { background: #ef4444 }
 .rk-foot { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; padding: 28px 0 36px; font-size: 14px }
@@ -92,6 +93,7 @@ function jsxPage(o, w, cls) {
           <a ${cls}="rk-btn solid" href="${w.deploy}">${ic.tag ? ic.tag + ' ' : ''}${w.deployLabel}</a>
           <a ${cls}="rk-btn" href="${w.docs}">Read the docs</a>
         </div>
+        <div ${cls}="rk-try"><button ${cls}="rk-btn" onClick={INC}>Clicked {COUNT} times</button><small>STATE_NOTE</small></div>
         <div ${cls}="rk-cards">
 ${cards}
         </div>
@@ -131,6 +133,8 @@ export default async function Home() {
           <a class="rk-btn solid" href="${w.deploy}">${icon ? `{raw(${icon[1]})} ` : ''}${w.deployLabel}</a>
           <a class="rk-btn" href="${w.docs}">Read the docs</a>
         </div>
+        {/* interactivity with Voodoo.js: no build step, no hydration, added only to pages that use it */}
+        <div class="rk-try" v-data="{ n: 0 }"><button class="rk-btn" v-on:click="n++">Clicked <span v-text="n">0</span> times</button><small>Voodoo.js, no build step</small></div>
         <div class="rk-cards">
 ${cards}
         </div>
@@ -166,10 +170,11 @@ export default function App() {
       setMsg(r.data ? \`API says hello to \${r.data.hello}\` : 'The API did not answer: is the server running?')
     })
   }, [])
+  const [n, setN] = useState(0)
   const STATUS_CLASS = api_ === 'wait' ? '' : api_
   const STATUS_TEXT = ${sx ? '<span {...stylex.props(s.num)}>{msg}</span>' : 'msg'}
   return (
-${o.motion && R ? body.replace('<main className="rk-main">', '<motion.main className="rk-main" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>').replace('      </main>', '      </motion.main>') : body}
+${(o.motion && R ? body.replace('<main className="rk-main">', '<motion.main className="rk-main" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>').replace('      </main>', '      </motion.main>') : body).replace('{INC}', '{() => setN(n + 1)}').replace('{COUNT}', '{n}').replace('STATE_NOTE', (R ? 'React' : 'Preact') + ' state, updated in the browser')}
   )
 }
 `
@@ -185,6 +190,7 @@ ${boltConst}
 export default function App() {
   const [state, setState] = createSignal<'wait' | 'ok' | 'bad'>('wait')
   const [msg, setMsg] = createSignal('Checking the API...')
+  const [n, setN] = createSignal(0)
   onMount(() =>
     ${status}.then((r) => {
       setState(r.data ? 'ok' : 'bad')
@@ -192,7 +198,7 @@ export default function App() {
     }),
   )
   return (
-${body.replace("dangerouslySetInnerHTML={{ __html: BOLT }}", 'innerHTML={BOLT}').replace("{'rk-dot ' + STATUS_CLASS}", "{'rk-dot ' + (state() === 'wait' ? '' : state())}").replace('{STATUS_TEXT}', '{msg()}')}
+${body.replace("dangerouslySetInnerHTML={{ __html: BOLT }}", 'innerHTML={BOLT}').replace("{'rk-dot ' + STATUS_CLASS}", "{'rk-dot ' + (state() === 'wait' ? '' : state())}").replace('{STATUS_TEXT}', '{msg()}').replace('{INC}', '{() => setN(n() + 1)}').replace('{COUNT}', '{n()}').replace('STATE_NOTE', 'Solid signal, updated in the browser')}
   )
 }
 `
@@ -208,6 +214,7 @@ ${ic.imp ? ic.imp + '\n' : ''}import { api } from './api'
 ${boltConst}
 const state = ref<'wait' | 'ok' | 'bad'>('wait')
 const msg = ref('Checking the API...')
+const n = ref(0)
 onMounted(async () => {
   const r = await ${status}
   state.value = r.data ? 'ok' : 'bad'
@@ -228,6 +235,7 @@ onMounted(async () => {
         <a class="rk-btn solid" href="${w.deploy}">${ic.tag ? ic.tag + ' ' : ''}${w.deployLabel}</a>
         <a class="rk-btn" href="${w.docs}">Read the docs</a>
       </div>
+      <div class="rk-try"><button class="rk-btn" @click="n++">Clicked {{ n }} times</button><small>Vue state, updated in the browser</small></div>
       <div class="rk-cards">
 ${cardsT('', '')}
       </div>
@@ -248,6 +256,7 @@ ${ic.imp ? '  ' + ic.imp + '\n' : ''}  import { api } from './api'
   ${boltConst}
   let state = $state<'wait' | 'ok' | 'bad'>('wait')
   let msg = $state('Checking the API...')
+  let n = $state(0)
   ${status}.then((r) => {
     state = r.data ? 'ok' : 'bad'
     msg = r.data ? \`API says hello to \${r.data.hello}\` : 'The API did not answer: is the server running?'
@@ -266,6 +275,7 @@ ${ic.imp ? '  ' + ic.imp + '\n' : ''}  import { api } from './api'
       <a class="rk-btn solid" href="${w.deploy}">${ic.tag ? ic.tag + ' ' : ''}${w.deployLabel}</a>
       <a class="rk-btn" href="${w.docs}">Read the docs</a>
     </div>
+    <div class="rk-try"><button class="rk-btn" onclick={() => n++}>Clicked {n} times</button><small>Svelte state, updated in the browser</small></div>
     <div class="rk-cards">
 ${cardsT('', '')}
     </div>
@@ -300,6 +310,7 @@ ${boltConst}
           <a class="rk-btn solid" href="${w.deploy}">${w.deployLabel}</a>
           <a class="rk-btn" href="${w.docs}">Read the docs</a>
         </div>
+        <div class="rk-try"><button class="rk-btn" (click)="n.set(n() + 1)">Clicked {{ n() }} times</button><small>Angular signal, updated in the browser</small></div>
         <div class="rk-cards">
 ${w.cards.map((c) => `          <a class="rk-card" href="${c.href}"><b>${c.title}</b><small>${esc(c.desc)}</small></a>`).join('\n')}
         </div>
@@ -314,6 +325,7 @@ ${w.foot.map((x) => `        <a href="${x.href}">${x.label}</a>`).join('\n')}
 export class AppComponent {
   state = signal<'wait' | 'ok' | 'bad'>('wait')
   msg = signal('Checking the API...')
+  n = signal(0)
   bolt
   constructor(sanitizer: DomSanitizer) {
     this.bolt = sanitizer.bypassSecurityTrustHtml(BOLT)

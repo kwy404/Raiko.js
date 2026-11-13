@@ -85,4 +85,6 @@ jobs:
         with:
           node-version: 22
       - run: bun install && bun run build && npm pack --pack-destination /tmp
-      - run: RAIKO_TGZ=$(ls /tmp/raiko.js-*.tgz) E2E_DIR=/tmp/e2e node test/e2e/templates.mjs ${{ matrix.template }}
+      # a real browser opens each generated app, clicks its counter and checks the API answers
+      - run: npm install --no-save --ignore-scripts playwright@1.49.1 && npx playwright install --with-deps chromium
+      - run: BROWSER_CHECK=native RAIKO_TGZ=$(ls /tmp/raiko.js-*.tgz) E2E_DIR=/tmp/e2e node test/e2e/templates.mjs ${{ matrix.template }}

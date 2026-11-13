@@ -173,6 +173,8 @@ export interface StreamOptions {
   transformShell?: (html: string) => string | Promise<string>
   /** HTML to show in place of a boundary that threw. Default: nothing. */
   onError?: (error: unknown) => string | Promise<string>
+  /** Called once with the HTML of every streamed boundary; whatever it returns is sent last. */
+  onEnd?: (streamedHtml: string) => string | Promise<string>
 }
 
 /**
@@ -190,6 +192,7 @@ export async function renderStream(node: Child, opts: StreamOptions = {}): Promi
     async start(controller) {
       controller.enqueue(enc.encode(head))
       let first = true
+      let streamed = ''
       const pending = new Map<number, Promise<{ id: number; html: string }>>()
       const queue = () => {
         for (const b of ctx.suspended!.splice(0)) {
@@ -214,7 +217,12 @@ export async function renderStream(node: Child, opts: StreamOptions = {}): Promi
         queue()
         const script = first ? SWAP : ''
         first = false
+        streamed += html
         controller.enqueue(enc.encode(`<template id="rk-t-${id}">${html}</template><script${nonce}>${script}rkSwap(${id})</script>`))
+      }
+      if (opts.onEnd) {
+        const extra = await opts.onEnd(streamed)
+        if (extra) controller.enqueue(enc.encode(extra))
       }
       controller.close()
     },
