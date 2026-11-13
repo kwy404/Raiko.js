@@ -104,7 +104,7 @@ for (const c of combos) {
         } catch {}
         const okCounter = /Clicked\s*2\s*times/.test(res.after || '')
         const okStatus = vite ? /API says hello/.test(res.status || '') : /Server rendered/.test(res.status || '')
-        step(`browser: ${(res.after || 'no counter').replace(/\s+/g, ' ').trim()}, ${res.status || 'no status'}`, { ok: okCounter && okStatus && !(res.errors || []).length, out: JSON.stringify(res) + (r.stderr || '').slice(-800) })
+        step(`browser: ${(res.after || 'no counter').replace(/\s+/g, ' ').trim()}, ${res.status || 'no status'}`, { ok: okCounter && okStatus && !(res.errors || []).length, out: JSON.stringify(res, null, 1) + (r.stderr || '').slice(-800) })
       }
       const docs = await get('/docs/json')
       step(`GET /docs/json ${docs.status}`, { ok: docs.status === 200, out: s.log() })
