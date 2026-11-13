@@ -54,7 +54,11 @@ const NO_DB = 'none'
 const steps = [
   { key: 'name', def: () => positional ?? 'raiko-app', given: () => positional, validate: nameError, ask: (a, back) => text('Project name', a.name ?? 'raiko-app', back) },
   { key: 'template', def: () => 'full', ask: (a, back) => select('Template', [{ value: 'full', label: 'Full', hint: 'pages, API, chat, everything below' }, { value: 'minimal', label: 'Minimal', hint: 'one page and one API route' }], a.template ?? 'full', back) },
-  { key: 'frontend', def: () => 'raiko', ask: (a, back) => select('Frontend', FRONTENDS, a.frontend ?? 'raiko', back) },
+  {
+    key: 'frontend',
+    def: () => 'raiko',
+    validate: (v) => (v === 'angular' ? `${col.r('error[RK0804]')}: the Angular template is paused while it gets fixed\n  = help: pick raiko, react, vue, svelte, solid or preact` : null),
+    ask: (a, back) => select('Frontend', FRONTENDS, a.frontend ?? 'raiko', back) },
   {
     key: 'css',
     def: () => 'monsoon',

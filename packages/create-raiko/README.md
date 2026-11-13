@@ -10,7 +10,7 @@ bun create raiko my-app
 pnpm create raiko my-app
 ```
 
-It asks for the frontend (Raiko Pages with Voodoo.js, React, Vue, Svelte, Solid, Preact, Angular), CSS (Monsoon, Tailwind, StyleX, UnoCSS), icons (glyphfox, Lucide, Heroicons), animations (Motion), database (Kastor, Prisma, Drizzle on SQLite or PostgreSQL), sign in (email and password, GitHub, Google, Discord, GitLab), two factor auth, email (Resend, Postmark, SendGrid, SMTP), translations (en, pt-BR, es, fr, de), admin roles with permissions per action, a cookie banner (cookieowl, LGPD or GDPR), an installable app (installkite) and the deploy target (Vercel, Cloudflare Workers, Docker, plain server).
+It asks for the frontend (Raiko Pages with Voodoo.js, React, Vue, Svelte, Solid, Preact), CSS (Monsoon, Tailwind, StyleX, UnoCSS), icons (glyphfox, Lucide, Heroicons), animations (Motion), database (Kastor, Prisma, Drizzle on SQLite or PostgreSQL), sign in (email and password, GitHub, Google, Discord, GitLab), two factor auth, email (Resend, Postmark, SendGrid, SMTP), translations (en, pt-BR, es, fr, de), admin roles with permissions per action, a cookie banner (cookieowl, LGPD or GDPR), an installable app (installkite) and the deploy target (Vercel, Cloudflare Workers, Docker, plain server).
 
 Every answer is also a flag, for scripts and CI:
 

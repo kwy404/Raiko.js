@@ -77,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        template: [pages-full, pages-min, pages-tailwind-drizzle, pages-uno-prisma, react, react-stylex, vue, svelte, solid, preact, angular]
+        template: [pages-full, pages-min, pages-tailwind-drizzle, pages-uno-prisma, react, react-stylex, vue, svelte, solid, preact]
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2

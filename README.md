@@ -54,7 +54,7 @@ npm run dev        # or: bun run dev
 | You picked | Open | What runs there |
 | --- | --- | --- |
 | Raiko Pages (the default) | http://localhost:3000 | pages, API, sockets, admin, one server |
-| React, Vue, Svelte, Solid, Preact or Angular | http://localhost:5173 | Vite, with the Raiko backend inside it on the same port |
+| React, Vue, Svelte, Solid or Preact | http://localhost:5173 | Vite, with the Raiko backend inside it on the same port |
 
 You will see the starter page with the next steps. Edit the file it names (`app/page.tsx`, or `web/src/App.tsx` for Vite templates), save, and the page reloads.
 
@@ -423,7 +423,7 @@ Every coded error (`RK0100` and up) has a page in the [error reference](https://
 
 ## Any frontend
 
-Raiko Pages render on the server. For a single page app, the Vite plugin runs the backend inside the Vite dev server, so React, Vue, Svelte, Solid, Preact or Angular share one port with the API:
+Raiko Pages render on the server. For a single page app, the Vite plugin runs the backend inside the Vite dev server, so React, Vue, Svelte, Solid or Preact share one port with the API:
 
 ```ts
 // vite.config.ts

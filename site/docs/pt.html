@@ -38,7 +38,7 @@ npm run dev        # ou: bun run dev
 <td>páginas, API, sockets e admin num servidor só</td>
 </tr>
 <tr>
-<td>React, Vue, Svelte, Solid, Preact ou Angular</td>
+<td>React, Vue, Svelte, Solid ou Preact</td>
 <td><a href="http://localhost:5173">http://localhost:5173</a></td>
 <td>o Vite, com o backend do Raiko dentro dele na mesma porta</td>
 </tr>
@@ -339,7 +339,7 @@ i18n.t(&#39;pt-BR&#39;, &#39;cart.items&#39;, { count: 3 })   // &quot;3 itens&q
    = help: rename the folder to [slug], or move one of the pages
 </code></pre>
 <p>Todo erro com código (<code>RK0100</code> em diante) tem uma página na <a href="https://kwy404.github.io/Raiko.js/docs/errors.html">referência de erros</a>.</p>
-<h2 id="qualquer-frontend">Qualquer frontend</h2><p>As Raiko Pages são renderizadas no servidor. Para uma single page app, o plugin do Vite roda o backend dentro do dev server do Vite, então React, Vue, Svelte, Solid, Preact ou Angular dividem a mesma porta com a API:</p>
+<h2 id="qualquer-frontend">Qualquer frontend</h2><p>As Raiko Pages são renderizadas no servidor. Para uma single page app, o plugin do Vite roda o backend dentro do dev server do Vite, então React, Vue, Svelte, Solid ou Preact dividem a mesma porta com a API:</p>
 <pre><code class="language-ts">// vite.config.ts
 import react from &#39;@vitejs/plugin-react&#39;
 import { raiko } from &#39;raiko.js/vite&#39;

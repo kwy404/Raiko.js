@@ -1,6 +1,6 @@
 /**
  * Vite plugin: run your Raiko backend inside the Vite dev server, so React,
- * Vue, Svelte, Solid, Preact or Angular (Analog) share one port with the API.
+ * Vue, Svelte, Solid or Preact share one port with the API.
  * In production `raiko build` serves the built frontend with SPA fallback.
  *
  *   // vite.config.ts

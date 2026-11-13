@@ -15,7 +15,6 @@ export const FRONTENDS = [
   { value: 'svelte', label: 'Svelte', hint: 'Vite' },
   { value: 'solid', label: 'Solid', hint: 'Vite' },
   { value: 'preact', label: 'Preact', hint: 'Vite' },
-  { value: 'angular', label: 'Angular', hint: 'Vite with Analog' },
 ]
 export const CSS = [
   { value: 'monsoon', label: 'Monsoon', hint: 'no build step, theme from one color' },

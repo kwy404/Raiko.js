@@ -19,7 +19,6 @@ const combos = [
   { id: 'svelte', frontend: 'svelte', css: 'unocss', orm: 'none', auth: 'none', email: 'none', icons: 'lucide', deploy: 'docker' },
   { id: 'solid', frontend: 'solid', css: 'none', orm: 'none', auth: 'credentials', email: 'none', icons: 'glyphfox', deploy: 'vercel' },
   { id: 'preact', frontend: 'preact', css: 'tailwind', orm: 'none', auth: 'none', email: 'none', icons: 'lucide', deploy: 'node' },
-  { id: 'angular', frontend: 'angular', css: 'monsoon', orm: 'none', auth: 'none', email: 'none', icons: 'none', deploy: 'docker' },
 ].filter((c) => !filter || c.id.includes(filter))
 
 const sh = (cmd, args, cwd, env = {}) => {
