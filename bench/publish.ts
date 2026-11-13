@@ -11,7 +11,7 @@ const groups = Object.entries(http.results as Record<string, Record<string, numb
   rows: Object.entries(r).map(([k, v]) => [NAMES[k] ?? k, v, 'req/s']),
 }))
 if (ssr) groups.unshift({ title: 'Server rendered page (50 items)', rows: Object.entries(ssr.results as Record<string, number>).map(([k, v]) => [NAMES[k] ?? k, v, 'req/s']) })
-writeFileSync('site/bench.js', readFileSync('site/bench.js', 'utf8').replace(/^window\.RK_BENCH = .*$/m, `window.RK_BENCH = ${JSON.stringify({ machine, groups })}`))
+if (existsSync('site/bench.js')) writeFileSync('site/bench.js', readFileSync('site/bench.js', 'utf8').replace(/^window\.RK_BENCH = .*$/m, `window.RK_BENCH = ${JSON.stringify({ machine, groups })}`))
 
 const fmt = (n: number) => n.toLocaleString('en-US')
 let table = ''

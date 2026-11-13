@@ -46,7 +46,7 @@ const page = (lang: string, title: string, nav: string, body: string, langs: str
 <html lang="${lang}" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title} | Raiko.js</title><meta name="description" content="Raiko.js documentation: app router, server components, typed API, WebSockets, auth, admin, email.">
 <link rel="icon" href="../logo.svg"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800&family=Geist+Mono&display=swap">
-<link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="docs.css"></head>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="docs.css"></head>
 <body><a class="skip" href="#doc">Skip to content</a>
 <header class="nav"><div class="wrap"><a class="brand" href="../"><img src="../logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a>
 <div class="sp"></div>${langs}<a class="ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>

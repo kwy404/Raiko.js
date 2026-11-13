@@ -1,117 +1,170 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Raiko.js: backend and frontend in one file tree</title>
-<meta name="description" content="Raiko.js is a TypeScript framework with a Next.js style app router, server components, typed API, encrypted WebSockets, auth, admin and email. Runs on Bun, Node, Deno, Cloudflare Workers and Vercel.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raiko.js</title>
+<meta name="description" content="Raiko.js is a TypeScript framework with pages, API, WebSockets, sign in and an admin panel in one app. Runs on Bun, Node, Deno, Cloudflare Workers and Vercel.">
 <link rel="canonical" href="https://kwy404.github.io/Raiko.js/">
-<meta property="og:title" content="Raiko.js"><meta property="og:description" content="Backend and frontend in one file tree. Every runtime."><meta property="og:image" content="https://kwy404.github.io/Raiko.js/banner-dark.svg"><meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0a0a0b">
+<meta property="og:title" content="Raiko.js"><meta property="og:description" content="Ship the backend and the frontend from one folder."><meta property="og:image" content="https://kwy404.github.io/Raiko.js/banner-dark.svg"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
 <link rel="icon" href="logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;800&family=Geist+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monsooncss@0.2.0/dist/monsoon.min.css">
 <link rel="stylesheet" href="style.css">
-<script>try{var t=localStorage.getItem('voodoo:theme');t=t&&t.replace(/"/g,'');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem('rk-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"Raiko.js","codeRepository":"https://github.com/kwy404/Raiko.js","programmingLanguage":"TypeScript","license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"Alexandre Kohler"}}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="nav">
-  <div class="wrap">
-    <a class="brand" href="./" aria-label="Raiko.js home"><img src="logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a>
-    <nav aria-label="Main">
+  <div class="nav-in">
+    <a class="brand" href="./" aria-label="Raiko.js home"><span class="mark" data-i="bolt"></span><span>Raiko<small>.js</small></span></a>
+    <nav class="links" aria-label="Main">
       <a href="docs/">{ T[lang].nav[0] }</a>
-      <a href="#bench">{ T[lang].nav[1] }</a>
-      <a href="#compare">{ T[lang].nav[2] }</a>
-      <a href="video/">{ T[lang].nav[3] }</a>
+      <a href="#features">{ T[lang].nav[1] }</a>
+      <a href="#performance">{ T[lang].nav[2] }</a>
+      <a href="#compare">{ T[lang].nav[3] }</a>
+      <a href="video/">{ T[lang].nav[4] }</a>
     </nav>
-    <div class="sp"></div>
+    <span class="sp"></span>
     <label class="sr-only" for="lang">Language</label>
-    <select id="lang" class="ghost" v-model="lang" v-on:change="setLang(lang)" aria-label="Language">
-      <option value="en">EN</option><option value="es">ES</option><option value="pt">PT</option>
-    </select>
-    <button class="ghost" v-theme-toggle aria-label="Toggle theme"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.259" stroke-linecap="round" stroke-linejoin="round" color="currentColor" class="glyphfox glyphfox-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 4.5L12 2"/><path d="M19.5 12L22 12"/><path d="M12 19.5L12 22"/><path d="M4.5 12L2 12"/><path d="M17.66 6.34L18.72 5.28"/><path d="M17.66 17.66L18.72 18.72"/><path d="M6.34 17.66L5.28 18.72"/><path d="M6.34 6.34L5.28 5.28"/></svg></button>
-    <a class="ghost" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none" href="https://github.com/kwy404/Raiko.js"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.259" stroke-linecap="round" stroke-linejoin="round" color="currentColor" class="glyphfox glyphfox-brand-github" aria-hidden="true"><path d="M9.5 21.5v-3c0-1.2 .3-2 .9-2.6A6.3 6.3 0 0 1 5 10a5.9 5.9 0 0 1 1.3-3.6V2.6l3.2 1.9a10.5 10.5 0 0 1 5 0l3.2-1.9v3.8A5.9 5.9 0 0 1 19 10a6.3 6.3 0 0 1-5.4 5.9c.6 .6 .9 1.4 .9 2.6v3"/><path d="M9.5 19.4c-2.7 .7-4.2-.3-5.2-1.6-.6-.8-1.2-1.2-2-1.3"/></svg><span class="hide-sm">GitHub</span></a>
+    <select id="lang" class="btn hide-sm" v-model="lang" v-on:change="setLang(lang)" aria-label="Language"><option value="en">EN</option><option value="es">ES</option><option value="pt">PT</option></select>
+    <button class="btn icon-btn hide-sm" v-on:click="toggleTheme()" aria-label="Toggle theme" data-i="sun"></button>
+    <a class="btn icon-btn hide-sm" href="https://github.com/kwy404/Raiko.js" aria-label="GitHub repository" data-i="branch"></a>
+    <a class="btn solid" href="docs/">{ T[lang].start }</a>
+    <button class="btn icon-btn burger" v-on:click="menu = !menu" :aria-expanded="menu" aria-controls="drawer" aria-label="Menu" data-i="menu"></button>
   </div>
 </header>
+<nav id="drawer" class="drawer" v-show="menu" hidden aria-label="Mobile">
+  <a href="docs/" v-on:click="menu = false">{ T[lang].nav[0] }</a>
+  <a href="#features" v-on:click="menu = false">{ T[lang].nav[1] }</a>
+  <a href="#performance" v-on:click="menu = false">{ T[lang].nav[2] }</a>
+  <a href="#compare" v-on:click="menu = false">{ T[lang].nav[3] }</a>
+  <a href="video/" v-on:click="menu = false">{ T[lang].nav[4] }</a>
+  <a href="https://github.com/kwy404/Raiko.js">GitHub</a>
+  <div style="display:flex;gap:8px;padding-top:16px"><select class="btn" v-model="lang" v-on:change="setLang(lang)" aria-label="Language"><option value="en">EN</option><option value="es">ES</option><option value="pt">PT</option></select><button class="btn" v-on:click="toggleTheme()">Theme</button></div>
+</nav>
 
-<main id="main">
-<section class="hero" style="padding:0">
-  <div class="grid-bg" aria-hidden="true"></div><div class="glow" aria-hidden="true"></div>
-  <div class="wrap">
-    <div>
-      <a class="pill" href="https://www.npmjs.com/package/raiko.js"><b>new</b>{ T[lang].badge }</a>
-      <h1>{ T[lang].h1a }<br><span class="g">{ T[lang].h1b }</span></h1>
-      <p class="lead">{ T[lang].sub }</p>
-      <div class="ctas">
-        <div class="cmd"><span><span class="p">$</span> bun create raiko</span><button v-on:click="copy()" aria-live="polite">{ copied ? T[lang].copied : T[lang].copy }</button></div>
-        <a class="btn y" href="docs/">{ T[lang].cta }</a>
-      </div>
-      <div class="rk-stats">
-        <div><b>107</b>tests</div><div><b>3.4M+</b>fuzz checks</div><div><b>5</b>runtimes</div><div><b>7</b>frontends</div><div><b>0</b>runtime deps</div>
-      </div>
-    </div>
-    <img class="mascot" src="mascot.svg" width="380" height="410" alt="Raiko, the Raiko.js mascot: a chibi fox girl with a lightning ear">
+<main id="main" class="frame">
+
+<section class="row hero">
+  <div class="rays" aria-hidden="true"><canvas id="rays"></canvas></div>
+  <a class="pill" href="https://github.com/kwy404/Raiko.js/releases/tag/v1.0.0"><b>{ T[lang].pill }</b><span>{ T[lang].pillLink } <i data-i="arrow"></i></span></a>
+  <h1>{ T[lang].h1 }</h1>
+  <p class="lede">{ T[lang].sub }</p>
+  <div class="ctas">
+    <a class="btn solid lg" href="docs/">{ T[lang].start }</a>
+    <a class="btn lg" href="docs/">{ T[lang].learn }</a>
+  </div>
+  <div class="cmd"><span><span class="d">$</span> <b>npx create-raiko@latest</b></span><button v-on:click="copy('npx create-raiko@latest')" :aria-label="copied ? 'Copied' : 'Copy command'" data-i="copy"></button></div>
+</section>
+
+<section class="row flush">
+  <div class="runtimes">
+    <p>{ T[lang].runs }</p>
+    <span class="rt"><i>B</i>Bun</span><span class="rt"><i>N</i>Node.js</span><span class="rt"><i>D</i>Deno</span><span class="rt"><i>W</i>Workers</span><span class="rt"><i>V</i>Vercel</span><span class="rt"><i>D</i>Docker</span>
   </div>
 </section>
 
-<section>
-  <div class="wrap">
-    <div class="eyebrow">TypeScript, end to end</div>
-    <h2>{ T[lang].codeTitle }</h2>
-    <p class="sub">{ T[lang].codeSub }</p>
-    <div class="code">
-      <div class="tabs" role="tablist">
-        <button role="tab" :class="{ on: tab === 0 }" v-on:click="tab = 0">server.ts</button>
-        <button role="tab" :class="{ on: tab === 1 }" v-on:click="tab = 1">app/blog/[slug]/page.tsx</button>
-        <button role="tab" :class="{ on: tab === 2 }" v-on:click="tab = 2">web/api.ts</button>
-        <button role="tab" :class="{ on: tab === 3 }" v-on:click="tab = 3">app/chat/socket.ts</button>
+<section class="row" id="features" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].featEyebrow }</p>
+    <h2>{ T[lang].featTitle }</h2>
+    <p class="lede">{ T[lang].featSub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="bento">
+    <article class="cell w3">
+      <div><h3><i data-i="folder"></i>{ T[lang].f[0][0] }</h3><p>{ T[lang].f[0][1] }</p></div>
+      <div class="ill tree codeill" v-pre>
+        <div class="on">app/</div>
+        <div>&nbsp; layout.tsx</div>
+        <div>&nbsp; page.tsx <span class="c">/</span></div>
+        <div>&nbsp; <span class="acc">blog/[slug]/</span>page.tsx <span class="c">/blog/:slug</span></div>
+        <div>&nbsp; dashboard/page.tsx <span class="c">auth = true</span></div>
+        <div>&nbsp; api/users/route.ts <span class="c">GET POST</span></div>
+        <div>&nbsp; chat/socket.ts <span class="c">WebSocket</span></div>
       </div>
-<pre data-hl v-pre v-show="tab === 0">import { Raiko, t } from 'raiko.js'
-import { cors, rateLimit } from 'raiko.js/plugins'
+    </article>
+    <article class="cell w3 end">
+      <div><h3><i data-i="server"></i>{ T[lang].f[1][0] }</h3><p>{ T[lang].f[1][1] }</p></div>
+      <div class="ill codeill" v-pre><span class="k">export default async function</span> <span class="f">Page</span>() {<br>&nbsp; <span class="k">const</span> posts = <span class="k">await</span> db.posts.<span class="f">findMany</span>()<br>&nbsp; <span class="k">return</span> &lt;ul&gt;{posts.<span class="f">map</span>(p =&gt; &lt;li&gt;{p.title}&lt;/li&gt;)}&lt;/ul&gt;<br>}<span class="zero">0 KB JS</span></div>
+    </article>
+    <article class="cell w2">
+      <div><h3><i data-i="braces"></i>{ T[lang].f[2][0] }</h3><p>{ T[lang].f[2][1] }</p></div>
+      <div class="ill" v-pre>api.<span class="f">get</span>('/users/<span class="t">|</span><div class="ac"><div class="sel">/users/:id <em>GET</em></div><div>/users <em>GET POST</em></div><div>/users/:id/posts <em>GET</em></div></div></div>
+    </article>
+    <article class="cell w2">
+      <div><h3><i data-i="lock"></i>{ T[lang].f[3][0] }</h3><p>{ T[lang].f[3][1] }</p></div>
+      <div class="ill" v-pre><div class="wire"><span class="node" data-i="globe"></span><span class="pipe"></span><span class="node" data-i="server"></span></div><div class="cipher">0000000004 9f3ac1e27b55 d0a4c18e6f02 b9d7e3a144f0 cc917a2e5b38</div></div>
+    </article>
+    <article class="cell w2 end">
+      <div><h3><i data-i="shield"></i>{ T[lang].f[4][0] }</h3><p>{ T[lang].f[4][1] }</p></div>
+      <div class="ill" v-pre><div>Google Authenticator</div><div class="otp"><span>4</span><span>2</span><span>0</span><span class="cur">7</span><span></span><span></span></div></div>
+    </article>
+    <article class="cell w2">
+      <div><h3><i data-i="grid"></i>{ T[lang].f[5][0] }</h3><p>{ T[lang].f[5][1] }</p></div>
+      <div class="ill" v-pre><table class="matrix"><thead><tr><th></th><th>list</th><th>read</th><th>edit</th><th>del</th></tr></thead><tbody><tr><td>admin</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td></tr><tr><td>support</td><td class="no">no</td><td class="y">yes</td><td class="y">yes</td><td class="no">no</td></tr><tr><td>viewer</td><td class="y">yes</td><td class="y">yes</td><td class="no">no</td><td class="no">no</td></tr></tbody></table></div>
+    </article>
+    <article class="cell w2">
+      <div><h3><i data-i="mail"></i>{ T[lang].f[6][0] }</h3><p>{ T[lang].f[6][1] }</p></div>
+      <div class="ill" v-pre><div class="mailcard"><small>To: ana@raiko.dev</small><b>Welcome, Ana</b>Your account is ready.<br><span class="b">Open the app</span></div></div>
+    </article>
+    <article class="cell w2 end">
+      <div><h3><i data-i="alert"></i>{ T[lang].f[7][0] }</h3><p>{ T[lang].f[7][1] }</p></div>
+      <div class="ill err codeill" v-pre><span class="r">error[RK0104]</span>: param names differ<br>&nbsp; --&gt; app/blog/[slug]/page.tsx<br>&nbsp;&nbsp; |&nbsp; app/blog/<span class="r">[id]</span>/page.tsx<br>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="r">^^^^</span><br>&nbsp;&nbsp; = <span class="h">help</span>: rename it to [slug]</div>
+    </article>
+  </div>
+</section>
 
-const app = new Raiko()
-  .use(cors({ origin: ['https://my.app'], credentials: true }))
-  .use(rateLimit({ max: 100 }))
-  // one schema: validation, types and OpenAPI docs
-  .post('/users', ({ body, status }) => status(201, { id: 1, ...body }), {
-    body: t.Object({ email: t.String({ format: 'email' }), name: t.String({ minLength: 2 }) }),
-  })
-  .get('/users/:id', ({ params }) => ({ id: params.id }))
+<section class="row" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].codeEyebrow }</p>
+    <h2>{ T[lang].codeTitle }</h2>
+    <p class="lede">{ T[lang].codeSub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="split">
+    <div class="editor">
+      <div class="tabs" role="tablist" aria-label="Example files">
+        <button role="tab" :class="{ on: tab === 0 }" :aria-selected="tab === 0" v-on:click="tab = 0">app/page.tsx</button>
+        <button role="tab" :class="{ on: tab === 1 }" :aria-selected="tab === 1" v-on:click="tab = 1">app/api/users/route.ts</button>
+        <button role="tab" :class="{ on: tab === 2 }" :aria-selected="tab === 2" v-on:click="tab = 2">app/chat/socket.ts</button>
+      </div>
+<pre data-hl v-pre v-show="tab === 0">import { db } from '../db'
 
-export default app // Bun, Node, Deno, Workers, Vercel</pre>
-<pre data-hl v-pre v-show="tab === 1" hidden>import { notFound } from 'raiko.js/server'
-import { db } from '../../../db'
+export const metadata = { title: 'Shop' }
+export const revalidate = 60
 
-export const revalidate = 60 // cached for a minute, like Next.js ISR
-export const roles = ['editor'] // only signed in editors
+export default async function Page() {
+  const products = await db.products.findMany()
+  return (
+    &lt;main>
+      &lt;h1>Products&lt;/h1>
+      &lt;ul>{products.map((p) =>
+        &lt;li>{p.name} &lt;b>${p.price}&lt;/b>&lt;/li>
+      )}&lt;/ul>
+    &lt;/main>
+  )
+}</pre>
+<pre data-hl v-pre v-show="tab === 1" hidden>import { t } from 'raiko.js'
 
-export async function generateMetadata({ params }) {
-  return { title: params.slug }
+export const schema = {
+  POST: { body: t.Object({ email: t.String({ format: 'email' }) }) },
 }
 
-// a server component: async, reads the database, ships zero JS
-export default async function Post({ params }) {
-  const post = await db.posts.findUnique({ where: { slug: params.slug } })
-  if (!post) notFound()
-  return &lt;article>&lt;h1>{post.title}&lt;/h1>&lt;/article>
-}</pre>
-<pre data-hl v-pre v-show="tab === 2" hidden>import { client } from 'raiko.js/client'
-import type { App } from '../server'
+export const GET = ({ query }) =>
+  db.users.findMany({ take: 20 })
 
-export const api = client&lt;App>('')
+export const POST = ({ body, status }) =>
+  status(201, db.users.create({ data: body }))</pre>
+<pre data-hl v-pre v-show="tab === 2" hidden>import { t } from 'raiko.js'
 
-// path, params, body and response are all typed from the server
-const { data, error } = await api.post('/users', {
-  body: { email: 'ana@raiko.dev', name: 'Ana' },
-})
-// error.status is 422 with the exact field when validation fails</pre>
-<pre data-hl v-pre v-show="tab === 3" hidden>import { t } from 'raiko.js'
-
-// WebSocket at /chat: validated, AES-GCM encrypted, rooms built in
 export default {
   body: t.Object({ text: t.String({ maxLength: 500 }) }),
   encrypt: true,
@@ -121,131 +174,150 @@ export default {
   },
 }</pre>
     </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="eyebrow">Batteries included</div>
-    <h2>{ T[lang].featTitle }</h2>
-    <p class="sub"></p>
-    <div class="feats">
-      <div class="feat" v-for="(f, i) in T[lang].feats"><div class="i" v-html="ICONS[i]" aria-hidden="true"></div><h3>{ f[0] }</h3><p>{ f[1] }</p></div>
+    <div class="preview">
+      <span class="label">{ T[lang].preview }</span>
+      <div class="browser" v-show="tab === 0"><div class="bar"><i></i><i></i><i></i><span>localhost:3000</span></div><div class="page" v-pre><h4>Products</h4><ul><li>Raiko hoodie <b>$59</b></li><li>Bolt mug <b>$19</b></li><li>Fox stickers <b>$5</b></li></ul></div></div>
+      <div class="browser" v-show="tab === 1" hidden><div class="bar"><i></i><i></i><i></i><span>POST /api/users</span></div><div class="json" v-pre>201 Created<br>{<br>&nbsp; <span class="key">"id"</span>: 7,<br>&nbsp; <span class="key">"email"</span>: "ana@raiko.dev"<br>}<br><br>422 Unprocessable Content<br>body.email: Expected a valid email</div></div>
+      <div class="browser" v-show="tab === 2" hidden><div class="bar"><i></i><i></i><i></i><span>wss://localhost:3000/chat</span></div><div class="chatprev" v-pre><span>hi, everyone</span><span class="me">hey Ana</span><span>is this encrypted?</span><span class="me">AES-GCM, per direction</span></div></div>
     </div>
   </div>
 </section>
 
-<section id="compare">
-  <div class="wrap">
-    <div class="eyebrow">Compare</div>
-    <h2>{ T[lang].cmpTitle }</h2>
-    <p class="sub">{ T[lang].cmpSub }</p>
-    <div class="scroll">
-    <table class="tbl">
-      <thead><tr><th></th><th>Raiko.js</th><th>Elysia</th><th>Next.js</th><th>Hono</th></tr></thead>
-      <tbody>
-        <tr><th>Runtimes</th><td class="r">Bun, Node, Deno, Workers, Vercel</td><td class="mid">Bun first</td><td class="mid">Node, Vercel</td><td class="yes">All</td></tr>
-        <tr><th>App router, layouts, loading, error</th><td class="r yes">Yes</td><td class="no">No</td><td class="yes">Yes</td><td class="no">No</td></tr>
-        <tr><th>Server components</th><td class="r yes">Yes, no React needed</td><td class="no">No</td><td class="yes">Yes</td><td class="mid">JSX only</td></tr>
-        <tr><th>Typed client from the server</th><td class="r yes">Yes</td><td class="yes">Yes (Eden)</td><td class="mid">Server actions</td><td class="yes">Yes (RPC)</td></tr>
-        <tr><th>WebSockets on every runtime</th><td class="r yes">Yes, own RFC 6455 on Node</td><td class="mid">Bun</td><td class="no">No</td><td class="mid">Per adapter</td></tr>
-        <tr><th>Encrypted WebSocket messages</th><td class="r yes">AES-GCM, replay safe</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
-        <tr><th>Auth with OAuth and 2FA</th><td class="r yes">Built in</td><td class="mid">Plugins</td><td class="mid">NextAuth</td><td class="mid">Middleware</td></tr>
-        <tr><th>Admin panel with role permissions</th><td class="r yes">Built in</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
-        <tr><th>Email templates with preview</th><td class="r yes">Built in</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
-        <tr><th>Raw API throughput</th><td class="r mid">See benchmarks</td><td class="yes">Very high</td><td class="no">Low</td><td class="yes">Very high</td></tr>
-        <tr><th>Ecosystem size</th><td class="r no">New</td><td class="mid">Growing</td><td class="yes">Huge</td><td class="yes">Large</td></tr>
-      </tbody>
-    </table>
-    </div>
+<section class="row" id="performance" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].perfEyebrow }</p>
+    <h2>{ T[lang].perfTitle }</h2>
+    <p class="lede">{ T[lang].perfSub }</p>
   </div>
 </section>
-
-<section id="bench">
-  <div class="wrap" style="display:grid;grid-template-columns:1fr 220px;gap:32px;align-items:end">
+<section class="row flush" style="border-top:0">
+  <div class="perf">
     <div>
-      <div class="eyebrow">Benchmarks</div>
-      <h2>{ T[lang].benchTitle }</h2>
-      <p class="sub">{ T[lang].benchSub }</p>
+      <div class="huge">24x</div>
+      <div class="bars" v-pre>
+        <div class="bar me"><b>Raiko.js</b><div class="tr"><div class="fl" style="width:100%"></div></div><span class="v">3,737/s</span></div>
+        <div class="bar"><b>Next.js 15</b><div class="tr"><div class="fl" style="width:4.2%"></div></div><span class="v">155/s</span></div>
+      </div>
+      <p class="note">Node 22, next start vs Raiko Pages. Raiko on Bun: 8,910/s.</p>
     </div>
-    <img src="mascot-run.svg" width="220" height="180" alt="" style="max-width:100%">
-  </div>
-  <div class="wrap">
-    <div class="bars" id="bars" v-pre></div>
-    <p class="note">{ T[lang].benchNote }</p>
+    <div>
+      <p class="eyebrow" style="margin-bottom:8px">{ T[lang].perfApi }</p>
+      <div style="overflow-x:auto"><table class="apitbl" v-pre>
+        <thead><tr><th>Route</th><th>Raiko.js</th><th>Elysia 1.4</th><th>Hono 4.13</th></tr></thead>
+        <tbody>
+          <tr><td>text</td><td class="win">99,040</td><td>83,192</td><td>63,920</td></tr>
+          <tr><td>params + json</td><td>66,943</td><td class="win">75,723</td><td>60,477</td></tr>
+          <tr><td>json body</td><td>51,136</td><td class="win">53,168</td><td>47,029</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">{ T[lang].perfNote }</p>
+    </div>
   </div>
 </section>
 
-<section>
-  <div class="wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center" id="install">
-    <div>
-      <div class="eyebrow">create-raiko</div>
-      <h2>{ T[lang].instTitle }</h2>
-      <p class="sub">{ T[lang].instSub }</p>
-      <img src="mascot-terminal.svg" width="300" height="240" alt="" style="max-width:100%">
-    </div>
-    <div class="term" aria-label="create-raiko terminal session"><div class="top"><i></i><i></i><i></i></div>
-<div class="body" v-pre><span class="d">$</span> bun create raiko my-app
+<section class="row" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].instEyebrow }</p>
+    <h2>{ T[lang].instTitle }</h2>
+    <p class="lede">{ T[lang].instSub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="inst">
+<div class="term" v-pre><span class="d">$</span> npx create-raiko@latest my-app
 <span class="q">?</span> Frontend <span class="a">Raiko Pages + Voodoo.js</span>
 <span class="q">?</span> CSS <span class="a">Monsoon</span>
-<span class="q">?</span> Icons <span class="a">glyphfox</span>
-<span class="q">?</span> Database ORM <span class="a">Kastor</span> on <span class="a">SQLite</span>
-<span class="q">?</span> Sign in <span class="a">Email and password, GitHub</span>
+<span class="q">?</span> Database ORM <span class="a">Kastor on SQLite</span>
+<span class="q">?</span> Sign in <span class="a">Email, GitHub</span>
 <span class="q">?</span> Two factor auth <span class="a">Yes</span>
-<span class="q">?</span> Email provider <span class="a">Resend</span>
-<span class="q">?</span> Translations <span class="a">en, pt-BR, es, fr, de</span>
 <span class="q">?</span> Admin roles <span class="a">editor, support</span>
-<span class="q">?</span> Cookie banner <span class="a">LGPD</span>
 <span class="q">?</span> Deploy <span class="a">Vercel</span>
   <span class="ok">ok</span> writing 41 files
-  <span class="ok">ok</span> installing with bun
+  <span class="ok">ok</span> installing with npm
 
-  role     users                        posts
-  <span class="a">admin</span>    all                          all
-  <span class="a">editor</span>   <span class="d">----</span> read <span class="d">------ ------ ------</span>   list read create update <span class="d">------</span>
-  <span class="a">support</span>  <span class="d">----</span> read <span class="d">------</span> update <span class="d">------</span>   <span class="d">----</span> read <span class="d">------ ------ ------</span>
-
-  <span class="ok">done.</span> cd my-app && bun run dev</div></div>
+  <span class="ok">done.</span> cd my-app &amp;&amp; npm run dev</div>
+    <div class="opts">
+      <div class="opt" v-for="o in T[lang].opts"><b>{ o[0] }</b><span>{ o[1] }</span></div>
+    </div>
   </div>
 </section>
 
-<section>
-  <div class="wrap">
-    <div class="eyebrow">Deploy</div>
-    <h2>{ T[lang].runTitle }</h2>
-    <p class="sub"></p>
-    <div class="logos"><span class="logo">Bun</span><span class="logo">Node.js</span><span class="logo">Deno</span><span class="logo">Cloudflare Workers</span><span class="logo">Vercel</span><span class="logo">Docker</span><span class="logo">Fly.io</span><span class="logo">Railway</span></div>
+<section class="row" id="compare" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].cmpEyebrow }</p>
+    <h2>{ T[lang].cmpTitle }</h2>
+    <p class="lede">{ T[lang].cmpSub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="scroll"><table class="cmp" v-pre>
+    <thead><tr><th></th><th class="me">Raiko.js</th><th>Elysia</th><th>Next.js</th><th>Hono</th></tr></thead>
+    <tbody>
+      <tr><th>Runtimes</th><td class="me yes">Bun, Node, Deno, Workers, Vercel</td><td class="lim">Bun first</td><td class="lim">Node, Vercel</td><td class="yes">All</td></tr>
+      <tr><th>App router with layouts</th><td class="me yes">Yes</td><td class="nope">No</td><td class="yes">Yes</td><td class="nope">No</td></tr>
+      <tr><th>Server components</th><td class="me yes">Yes, no React needed</td><td class="nope">No</td><td class="yes">Yes</td><td class="lim">JSX only</td></tr>
+      <tr><th>Typed client</th><td class="me yes">Yes</td><td class="yes">Yes (Eden)</td><td class="lim">Server actions</td><td class="yes">Yes (RPC)</td></tr>
+      <tr><th>WebSockets on every runtime</th><td class="me yes">Yes</td><td class="lim">Bun</td><td class="nope">No</td><td class="lim">Per adapter</td></tr>
+      <tr><th>Encrypted WebSocket messages</th><td class="me yes">Yes</td><td class="nope">No</td><td class="nope">No</td><td class="nope">No</td></tr>
+      <tr><th>Sign in with 2FA</th><td class="me yes">Built in</td><td class="lim">Plugins</td><td class="lim">NextAuth</td><td class="lim">Middleware</td></tr>
+      <tr><th>Admin panel with permissions</th><td class="me yes">Built in</td><td class="nope">No</td><td class="nope">No</td><td class="nope">No</td></tr>
+      <tr><th>Ecosystem size</th><td class="me nope">New</td><td class="lim">Growing</td><td class="yes">Huge</td><td class="yes">Large</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="row" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].secEyebrow }</p>
+    <h2>{ T[lang].secTitle }</h2>
+    <p class="lede">{ T[lang].secSub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="stats"><div v-for="s in T[lang].stat"><b>{ s[0] }</b><span>{ s[1] }</span></div></div>
+</section>
+
+<section class="row" style="padding-bottom:0">
+  <div class="head"><h2 style="font-size:clamp(24px,3vw,32px)">{ T[lang].madeTitle }</h2></div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="made">
+    <a href="https://kwy404.github.io/Voodoo.js/"><b>Voodoo.js</b><span>Interactivity in pages, no build</span></a>
+    <a href="https://kwy404.github.io/monsoon/"><b>Monsoon</b><span>CSS with no build step</span></a>
+    <a href="https://kwy404.github.io/glyphfox/"><b>glyphfox</b><span>Morphable icons</span></a>
+    <a href="https://kwy404.github.io/kastor/"><b>Kastor</b><span>The TypeScript ORM</span></a>
+    <a href="https://kwy404.github.io/a11ymedic/"><b>a11ymedic</b><span>Accessibility checks in dev</span></a>
+    <a href="https://kwy404.github.io/cookieowl/"><b>cookieowl</b><span>LGPD and GDPR consent</span></a>
+    <a href="https://kwy404.github.io/installkite/"><b>installkite</b><span>Installable, offline apps</span></a>
+    <a href="https://kwy404.github.io/edgegoat/"><b>edgegoat</b><span>Edge case test inputs</span></a>
   </div>
 </section>
 
-<section>
-  <div class="wrap" style="display:grid;grid-template-columns:1fr 240px;gap:32px;align-items:center">
-    <div>
-      <div class="eyebrow">Open source</div>
-      <h2>{ T[lang].madeTitle }</h2>
-    </div>
-    <img src="mascot-shield.svg" width="240" height="210" alt="" style="max-width:100%">
+<section class="row cta">
+  <h2>{ T[lang].ctaTitle }</h2>
+  <div class="ctas">
+    <a class="btn solid lg" href="docs/">{ T[lang].start }</a>
+    <a class="btn lg" href="https://github.com/kwy404/Raiko.js">GitHub</a>
   </div>
-  <div class="wrap">
-    <div class="made">
-      <a href="https://kwy404.github.io/Voodoo.js/"><b>Voodoo.js</b><span>Interactivity in pages, no build</span></a>
-      <a href="https://kwy404.github.io/monsoon/"><b>Monsoon</b><span>CSS for this site and the templates</span></a>
-      <a href="https://kwy404.github.io/glyphfox/"><b>glyphfox</b><span>Every icon on this page</span></a>
-      <a href="https://kwy404.github.io/kastor/"><b>Kastor</b><span>Default TypeScript ORM</span></a>
-      <a href="https://kwy404.github.io/a11ymedic/"><b>a11ymedic</b><span>Accessibility checks in dev</span></a>
-      <a href="https://kwy404.github.io/cookieowl/"><b>cookieowl</b><span>LGPD and GDPR cookie banner</span></a>
-      <a href="https://kwy404.github.io/installkite/"><b>installkite</b><span>Installable apps, offline</span></a>
-      <a href="https://kwy404.github.io/edgegoat/"><b>edgegoat</b><span>Edge case test inputs</span></a>
-    </div>
-  </div>
+  <img src="mascot.svg" width="220" height="238" alt="Raiko, the fox mascot of Raiko.js">
 </section>
 </main>
 
-<footer><div class="wrap"><span>{ T[lang].foot }</span><span class="sp"></span><a href="https://github.com/kwy404/Raiko.js">GitHub</a><a href="https://www.npmjs.com/package/raiko.js">npm</a><a href="docs/">Docs</a></div></footer>
+<footer>
+  <div class="foot">
+    <div>
+      <a class="brand" href="./" style="padding:0"><span class="mark" data-i="bolt"></span><span>Raiko<small>.js</small></span></a>
+      <p>{ T[lang].foot.lic }</p>
+      <div class="tools"><select class="btn" v-model="lang" v-on:change="setLang(lang)" aria-label="Language"><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option></select><button class="btn icon-btn" v-on:click="toggleTheme()" aria-label="Toggle theme" data-i="sun"></button></div>
+    </div>
+    <div><h4>{ T[lang].foot.res }</h4><a href="docs/">Docs</a><a href="docs/errors.html">Error codes</a><a href="#performance">Benchmarks</a><a href="video/">Video</a></div>
+    <div><h4>{ T[lang].foot.proj }</h4><a href="https://github.com/kwy404/Raiko.js">GitHub</a><a href="https://www.npmjs.com/package/raiko.js">npm</a><a href="https://github.com/kwy404/Raiko.js/releases">Releases</a><a href="https://github.com/kwy404/Raiko.js/blob/main/SECURITY.md">Security</a></div>
+    <div><h4>{ T[lang].foot.more }</h4><a href="https://kwy404.github.io/Voodoo.js/">Voodoo.js</a><a href="https://kwy404.github.io/monsoon/">Monsoon</a><a href="https://kwy404.github.io/glyphfox/">glyphfox</a><a href="https://kwy404.github.io/kastor/">Kastor</a></div>
+  </div>
+</footer>
 
-<script src="i18n.js"></script>
-<script src="bench.js"></script>
 <script src="icons.js"></script>
+<script src="i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/voodoojs@1.1.0/dist/voodoo.full.min.js" defer></script>
 <script src="site.js" defer></script>
 </body>
