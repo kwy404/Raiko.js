@@ -42,7 +42,7 @@ jobs:
         with:
           name: dist
           path: dist
-      - run: npm install --no-save ws@8.18.0
+      - run: npm install --no-save --legacy-peer-deps --ignore-scripts ws@8.18.0
       - run: node test/node/smoke.mjs
 
   deno:
