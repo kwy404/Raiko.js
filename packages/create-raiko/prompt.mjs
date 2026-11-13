@@ -1,95 +1,176 @@
-// Tiny interactive prompts with arrow keys, no dependencies.
+// Interactive prompts with arrow keys, no dependencies.
+// Every prompt resolves to its value, or to BACK when the person presses Esc, Backspace or the left arrow.
 import readline from 'node:readline'
 
-const tty = process.stdin.isTTY && process.stdout.isTTY
-const esc = (n) => `\x1b[${n}m`
-export const col = { y: (s) => `${esc(33)}${s}${esc(0)}`, d: (s) => `${esc(2)}${s}${esc(0)}`, g: (s) => `${esc(32)}${s}${esc(0)}`, b: (s) => `${esc(1)}${s}${esc(0)}`, r: (s) => `${esc(31)}${s}${esc(0)}`, c: (s) => `${esc(36)}${s}${esc(0)}` }
+export const BACK = Symbol('back')
+const tty = !!(process.stdin.isTTY && process.stdout.isTTY)
+const esc = (n) => (s) => (tty ? `\x1b[${n}m${s}\x1b[0m` : s)
+export const col = { y: esc(33), d: esc(2), g: esc(32), b: esc(1), r: esc(31), c: esc(36) }
+
+const visible = (s) => s.replace(/\x1b\[[0-9;]*m/g, '')
+/** Cut a line to the terminal width so it never wraps: a wrapped line would break the redraw. */
+function fit(s) {
+  const width = Math.max(20, (process.stdout.columns || 80) - 1)
+  if (visible(s).length <= width) return s
+  let out = ''
+  let n = 0
+  for (const part of s.split(/(\x1b\[[0-9;]*m)/)) {
+    if (part.startsWith('\x1b[')) {
+      out += part
+      continue
+    }
+    for (const ch of part) {
+      if (n >= width - 1) return out + '\x1b[0m' + (tty ? '…' : '...')
+      out += ch
+      n++
+    }
+  }
+  return out
+}
+
+/** Draw a block of lines in place: move up over the previous block, clear it, write the new one. */
+function painter() {
+  let last = 0
+  return {
+    draw(lines) {
+      let out = ''
+      if (last) out += `\x1b[${last}A\r`
+      out += '\x1b[0J' + lines.map(fit).join('\n') + '\n'
+      process.stdout.write(out)
+      last = lines.length
+    },
+    clear() {
+      if (last) process.stdout.write(`\x1b[${last}A\r\x1b[0J`)
+      last = 0
+    },
+  }
+}
 
 function keys(onKey) {
   readline.emitKeypressEvents(process.stdin)
   process.stdin.setRawMode(true)
   process.stdin.resume()
-  const h = (_, k) => {
-    if (k?.ctrl && k.name === 'c') {
+  const h = (str, k = {}) => {
+    if (k.ctrl && k.name === 'c') {
       process.stdout.write('\x1b[?25h\n')
       process.exit(130)
     }
-    onKey(k ?? {})
+    onKey(k, str)
   }
   process.stdin.on('keypress', h)
+  process.stdout.write('\x1b[?25l')
   return () => {
     process.stdin.off('keypress', h)
     process.stdin.setRawMode(false)
     process.stdin.pause()
+    process.stdout.write('\x1b[?25h')
   }
 }
 
-/** Single choice. options: [{ value, label, hint }] */
-export function select(question, options, initial = 0) {
-  if (!tty) return Promise.resolve(options[initial].value)
+const isBack = (k) => k.name === 'escape' || k.name === 'left' || k.name === 'backspace'
+const legend = (multi, canBack) =>
+  col.d(`  ${multi ? 'space to mark, ' : ''}arrows to move, enter to ${multi ? 'confirm' : 'choose'}${canBack ? ', esc to go back' : ''}`)
+const done = (question, answer) => fit(`${col.g("+")} ${question} ${col.y(answer)}`)
+
+/** Single choice. options: [{ value, label, hint }]. `initial` is a value or an index. */
+export function select(question, options, initial = 0, canBack = true) {
+  let i = typeof initial === 'number' ? initial : Math.max(0, options.findIndex((o) => o.value === initial))
+  if (!tty) return Promise.resolve(options[i].value)
   return new Promise((resolve) => {
-    let i = initial
-    const draw = (first) => {
-      if (!first) process.stdout.write(`\x1b[${options.length}A`)
-      for (const [n, o] of options.entries())
-        process.stdout.write(`\x1b[2K  ${n === i ? col.y('>') : ' '} ${n === i ? col.b(o.label) : o.label}${o.hint ? '  ' + col.d(o.hint) : ''}\n`)
-    }
-    process.stdout.write(`\x1b[?25l${col.c('?')} ${col.b(question)} ${col.d('(arrows, enter)')}\n`)
-    draw(true)
-    const stop = keys((k) => {
-      if (k.name === 'up') i = (i - 1 + options.length) % options.length
-      else if (k.name === 'down' || k.name === 'tab') i = (i + 1) % options.length
-      else if (k.name === 'return') {
+    const p = painter()
+    const render = () =>
+      p.draw([
+        `${col.c('?')} ${col.b(question)}`,
+        ...options.map((o, n) => `  ${n === i ? col.y('>') : ' '} ${n === i ? col.b(o.label) : o.label}${o.hint ? '  ' + col.d(o.hint) : ''}`),
+        legend(false, canBack),
+      ])
+    render()
+    const stop = keys((k, str) => {
+      if (k.name === 'up' || k.name === 'k') i = (i - 1 + options.length) % options.length
+      else if (k.name === 'down' || k.name === 'j' || k.name === 'tab') i = (i + 1) % options.length
+      else if (str && /^[1-9]$/.test(str) && Number(str) <= options.length) i = Number(str) - 1
+      else if (k.name === 'return' || k.name === 'enter' || k.name === 'right') {
         stop()
-        process.stdout.write(`\x1b[${options.length + 1}A\x1b[0J${col.g('+')} ${question} ${col.y(options[i].label)}\n\x1b[?25h`)
+        p.clear()
+        process.stdout.write(done(question, options[i].label) + '\n')
         return resolve(options[i].value)
+      } else if (canBack && isBack(k)) {
+        stop()
+        p.clear()
+        return resolve(BACK)
       } else return
-      draw(false)
+      render()
     })
   })
 }
 
-/** Multiple choice with space. */
-export function multiselect(question, options, initial = []) {
-  if (!tty) return Promise.resolve(initial)
+/** Multiple choice: space marks, enter confirms. */
+export function multiselect(question, options, initial = [], canBack = true) {
+  const on = new Set(initial)
+  if (!tty) return Promise.resolve([...on])
   return new Promise((resolve) => {
     let i = 0
-    const on = new Set(initial)
-    const draw = (first) => {
-      if (!first) process.stdout.write(`\x1b[${options.length}A`)
-      for (const [n, o] of options.entries())
-        process.stdout.write(`\x1b[2K  ${n === i ? col.y('>') : ' '} ${on.has(o.value) ? col.g('[x]') : col.d('[ ]')} ${o.label}${o.hint ? '  ' + col.d(o.hint) : ''}\n`)
-    }
-    process.stdout.write(`\x1b[?25l${col.c('?')} ${col.b(question)} ${col.d('(space to toggle, enter)')}\n`)
-    draw(true)
-    const stop = keys((k) => {
-      if (k.name === 'up') i = (i - 1 + options.length) % options.length
-      else if (k.name === 'down') i = (i + 1) % options.length
-      else if (k.name === 'space') on.has(options[i].value) ? on.delete(options[i].value) : on.add(options[i].value)
-      else if (k.name === 'return') {
+    const p = painter()
+    const render = () =>
+      p.draw([
+        `${col.c('?')} ${col.b(question)}`,
+        ...options.map((o, n) => `  ${n === i ? col.y('>') : ' '} ${on.has(o.value) ? col.g('[x]') : col.d('[ ]')} ${n === i ? col.b(o.label) : o.label}${o.hint ? '  ' + col.d(o.hint) : ''}`),
+        legend(true, canBack),
+      ])
+    render()
+    const stop = keys((k, str) => {
+      const o = options[i]
+      if (k.name === 'up' || k.name === 'k') i = (i - 1 + options.length) % options.length
+      else if (k.name === 'down' || k.name === 'j' || k.name === 'tab') i = (i + 1) % options.length
+      else if (k.name === 'space' || str === 'x') on.has(o.value) ? on.delete(o.value) : on.add(o.value)
+      else if (str === 'a') options.every((x) => on.has(x.value)) ? on.clear() : options.forEach((x) => on.add(x.value))
+      else if (k.name === 'return' || k.name === 'enter') {
         stop()
-        const picked = options.filter((o) => on.has(o.value))
-        process.stdout.write(`\x1b[${options.length + 1}A\x1b[0J${col.g('+')} ${question} ${col.y(picked.map((o) => o.label).join(', ') || 'none')}\n\x1b[?25h`)
-        return resolve(picked.map((o) => o.value))
+        p.clear()
+        const picked = options.filter((x) => on.has(x.value))
+        process.stdout.write(done(question, picked.map((x) => x.label).join(', ') || 'none') + '\n')
+        return resolve(picked.map((x) => x.value))
+      } else if (canBack && (k.name === 'escape' || k.name === 'left' || k.name === 'backspace')) {
+        stop()
+        p.clear()
+        return resolve(BACK)
       } else return
-      draw(false)
+      render()
     })
   })
 }
 
-export function text(question, initial = '') {
+/** Text input with a default. Esc goes back; Backspace on an empty field also goes back. */
+export function text(question, initial = '', canBack = true) {
   if (!tty) return Promise.resolve(initial)
   return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-    rl.question(`${col.c('?')} ${col.b(question)} ${col.d(`(${initial})`)} `, (a) => {
-      rl.close()
-      resolve(a.trim() || initial)
+    let value = ''
+    const p = painter()
+    const render = () => p.draw([`${col.c('?')} ${col.b(question)} ${value ? value : col.d(initial)}${tty ? '\x1b[7m \x1b[0m' : ''}`, col.d(`  type and press enter${canBack ? ', esc to go back' : ''}`)])
+    render()
+    const stop = keys((k, str) => {
+      if (k.name === 'return' || k.name === 'enter') {
+        stop()
+        p.clear()
+        const v = value.trim() || initial
+        process.stdout.write(done(question, v) + '\n')
+        return resolve(v)
+      }
+      if (canBack && (k.name === 'escape' || (k.name === 'backspace' && !value))) {
+        stop()
+        p.clear()
+        return resolve(BACK)
+      }
+      if (k.name === 'backspace') value = value.slice(0, -1)
+      else if (str && !k.ctrl && !k.meta && str.length === 1 && str >= ' ') value += str
+      else return
+      render()
     })
   })
 }
 
-export const confirm = (question, initial = true) =>
-  select(question, initial ? [{ value: true, label: 'Yes' }, { value: false, label: 'No' }] : [{ value: false, label: 'No' }, { value: true, label: 'Yes' }])
+export const confirm = (question, initial = true, canBack = true) =>
+  select(question, [{ value: true, label: 'Yes' }, { value: false, label: 'No' }], initial ? 0 : 1, canBack)
 
 /** Little animated mascot while something runs. */
 export async function spin(label, fn) {

@@ -206,7 +206,9 @@ describe('fuzz: crypto', () => {
     }), { numRuns: Math.ceil(RUNS / 5) })
   })
   it('jwt round trip and wrong secret', async () => {
-    await fc.assert(fc.asyncProperty(fc.dictionary(fc.stringMatching(/^[a-z]{1,6}$/), fc.oneof(fc.string(), fc.integer())), async (claims) => {
+    // exp, nbf and iat are time claims with their own rules, tested on their own below
+    const RESERVED = new Set(['exp', 'nbf', 'iat'])
+    await fc.assert(fc.asyncProperty(fc.dictionary(fc.stringMatching(/^[a-z]{1,6}$/).filter((k) => !RESERVED.has(k)), fc.oneof(fc.string(), fc.integer())), async (claims) => {
       const tok = await signJwt(claims, 'a-very-long-secret-value')
       expect(await verifyJwt(tok, 'a-very-long-secret-value')).toMatchObject(claims)
       expect(await verifyJwt(tok, 'another-long-secret-value')).toBeNull()
@@ -217,6 +219,17 @@ describe('fuzz: crypto', () => {
       const back = base32Decode(base32Encode(b))
       expect(Buffer.from(back).equals(Buffer.from(b))).toBe(true)
     }), opts)
+  })
+})
+
+describe('jwt time claims', () => {
+  it('rejects expired and not yet valid tokens, accepts current ones', async () => {
+    const now = Math.floor(Date.now() / 1000)
+    const secret = 'a-very-long-secret-value'
+    expect(await verifyJwt(await signJwt({ exp: 0 }, secret), secret)).toBeNull()
+    expect(await verifyJwt(await signJwt({ exp: now - 1 }, secret), secret)).toBeNull()
+    expect(await verifyJwt(await signJwt({ nbf: now + 60 }, secret), secret)).toBeNull()
+    expect(await verifyJwt(await signJwt({ exp: now + 60, nbf: now - 1 }, secret), secret)).toMatchObject({ exp: now + 60 })
   })
 })
 

@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve, basename } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { select, multiselect, text, confirm, spin, col } from './prompt.mjs'
+import { select, multiselect, text, confirm, spin, col, BACK } from './prompt.mjs'
 import { generate, FRONTENDS, CSS, ICONS, run } from './templates.mjs'
 
 const argv = process.argv.slice(2)
@@ -31,53 +31,106 @@ const ROLE_PRESETS = {
   viewer: { users: [], posts: ['list', 'read'] },
 }
 
-console.log(`
-  ${col.y('  /\\_/\\   ')}  ${col.b('raiko')}${col.d('.js')}
-  ${col.y(' ( o.o )  ')}  ${col.d('backend and frontend in one file tree')}
-  ${col.y('  > ^ <   ')}  ${col.d('every runtime. strikes first.')}
-`)
+// compact banner on narrow terminals so nothing wraps
+console.log(
+  (process.stdout.columns || 80) >= 56
+    ? `\n  ${col.y('  /\\_/\\   ')}  ${col.b('raiko')}${col.d('.js')}\n  ${col.y(' ( o.o )  ')}  ${col.d('backend and frontend in one file tree')}\n  ${col.y('  > ^ <   ')}  ${col.d('every runtime. strikes first.')}\n`
+    : `\n  ${col.y('( o.o )')} ${col.b('raiko')}${col.d('.js')}\n`,
+)
 
 const positional = argv.find((a, i) => !a.startsWith('-') && !(argv[i - 1] ?? '').startsWith('--'))
-const name = positional ?? (yes ? 'raiko-app' : await text('Project name', 'raiko-app'))
+const interactive = !yes && !!(process.stdin.isTTY && process.stdout.isTTY)
+
 // npm package name rules: the name also lands in generated code, so nothing else is allowed
-if (!/^[a-z0-9][a-z0-9._-]{0,213}$/.test(basename(name))) {
-  console.error(`\n  ${col.r('error[RK0803]')}: "${basename(name).replace(/[^\x20-\x7e]/g, '?')}" is not a valid project name\n  = help: lowercase letters, digits, dot, dash and underscore, like my-app\n`)
-  process.exit(1)
+const nameError = (n) => {
+  if (!/^[a-z0-9][a-z0-9._-]{0,213}$/.test(basename(n)))
+    return `${col.r('error[RK0803]')}: "${basename(n).replace(/[^\x20-\x7e]/g, '?')}" is not a valid project name\n  = help: lowercase letters, digits, dot, dash and underscore, like my-app`
+  const d = resolve(n)
+  if (existsSync(d) && readdirSync(d).length && !argv.includes('--force')) return `${col.r('error[RK0801]')}: folder ${n} is not empty\n  = help: pick another name or pass --force`
+  return null
 }
+
+const NO_DB = 'none'
+const steps = [
+  { key: 'name', def: () => positional ?? 'raiko-app', given: () => positional, validate: nameError, ask: (a, back) => text('Project name', a.name ?? 'raiko-app', back) },
+  { key: 'template', def: () => 'full', ask: (a, back) => select('Template', [{ value: 'full', label: 'Full', hint: 'pages, API, chat, everything below' }, { value: 'minimal', label: 'Minimal', hint: 'one page and one API route' }], a.template ?? 'full', back) },
+  { key: 'frontend', def: () => 'raiko', ask: (a, back) => select('Frontend', FRONTENDS, a.frontend ?? 'raiko', back) },
+  {
+    key: 'css',
+    def: () => 'monsoon',
+    validate: (v, a) => (v === 'stylex' && a.frontend !== 'react' ? `${col.r('error[RK0802]')}: StyleX needs the React frontend\n  = help: pick React, or another CSS option` : null),
+    ask: (a, back) => {
+      const opts = CSS.filter((c) => !c.only || c.only.includes(a.frontend))
+      return select('CSS', opts, opts.some((o) => o.value === a.css) ? a.css : 'monsoon', back)
+    },
+  },
+  {
+    key: 'icons',
+    def: () => 'glyphfox',
+    ask: (a, back) => {
+      const opts = ICONS.filter((c) => !c.only || c.only.includes(a.frontend))
+      return select('Icons', opts, opts.some((o) => o.value === a.icons) ? a.icons : 'glyphfox', back)
+    },
+  },
+  { key: 'motion', def: () => false, ask: (a, back) => confirm('Animations with Motion (formerly Framer Motion)?', a.motion ?? false, back) },
+  { key: 'orm', def: () => NO_DB, ask: (a, back) => select('Database ORM', [{ value: 'kastor', label: 'Kastor', hint: 'TypeScript ORM, no codegen' }, { value: 'prisma', label: 'Prisma' }, { value: 'drizzle', label: 'Drizzle' }, { value: NO_DB, label: 'No database' }], a.orm ?? NO_DB, back) },
+  { key: 'db', when: (a) => a.orm !== NO_DB, skip: NO_DB, def: () => 'sqlite', ask: (a, back) => select('Database', [{ value: 'sqlite', label: 'SQLite', hint: 'a file, no server needed' }, { value: 'postgres', label: 'PostgreSQL' }], a.db && a.db !== NO_DB ? a.db : 'sqlite', back) },
+  { key: 'auth', list: true, def: () => [], ask: (a, back) => multiselect('Sign in methods', [{ value: 'credentials', label: 'Email and password' }, { value: 'github', label: 'GitHub' }, { value: 'google', label: 'Google' }, { value: 'discord', label: 'Discord' }, { value: 'gitlab', label: 'GitLab' }], a.auth ?? ['credentials'], back) },
+  { key: 'twofa', when: (a) => a.auth.length > 0, skip: false, def: () => false, ask: (a, back) => confirm('Two factor auth with Google Authenticator (TOTP)?', a.twofa ?? true, back) },
+  { key: 'email', def: () => 'none', ask: (a, back) => select('Email provider', [{ value: 'resend', label: 'Resend' }, { value: 'postmark', label: 'Postmark' }, { value: 'sendgrid', label: 'SendGrid' }, { value: 'smtp', label: 'SMTP', hint: 'any server, via nodemailer' }, { value: 'none', label: 'None for now', hint: 'emails print in the terminal' }], a.email ?? 'none', back) },
+  { key: 'i18n', def: () => false, ask: (a, back) => confirm('Translations (en, pt-BR, es, fr, de)?', a.i18n ?? false, back) },
+  { key: 'admin', when: (a) => a.orm !== NO_DB, skip: false, def: () => true, ask: (a, back) => confirm('Admin panel at /admin?', a.admin ?? true, back) },
+  { key: 'roles', list: true, when: (a) => a.admin, skip: [], def: () => ['editor'], ask: (a, back) => multiselect('Admin roles (admin always has full access)', [{ value: 'editor', label: 'editor', hint: 'manage posts, read users' }, { value: 'support', label: 'support', hint: 'fix users, cannot list or delete' }, { value: 'viewer', label: 'viewer', hint: 'read only' }], a.roles ?? ['editor'], back) },
+  { key: 'cookies', def: () => 'none', ask: (a, back) => select('Cookie consent banner (cookieowl)', [{ value: 'none', label: 'None' }, { value: 'lgpd', label: 'LGPD', hint: 'Brazil, Portuguese texts' }, { value: 'gdpr', label: 'GDPR', hint: 'Europe, visitor language' }], a.cookies ?? 'none', back) },
+  { key: 'pwa', def: () => false, ask: (a, back) => confirm('Installable app with offline support (installkite)?', a.pwa ?? false, back) },
+  { key: 'deploy', def: () => 'docker', ask: (a, back) => select('Deploy target', [{ value: 'vercel', label: 'Vercel' }, { value: 'cloudflare', label: 'Cloudflare Workers' }, { value: 'docker', label: 'Docker', hint: 'Fly, Railway, Render, any VPS' }, { value: 'node', label: 'Plain server', hint: 'bun or node on your machine' }], a.deploy ?? 'docker', back) },
+  { key: 'pm', def: () => detectedPm, ask: (a, back) => select('Package manager', [{ value: detectedPm, label: detectedPm, hint: 'detected' }, ...['bun', 'npm', 'pnpm', 'yarn'].filter((p) => p !== detectedPm).map((p) => ({ value: p, label: p }))], a.pm ?? detectedPm, back) },
+  { key: 'install', def: () => !argv.includes('--no-install'), ask: (a, back) => confirm('Install dependencies now?', a.install ?? true, back) },
+  { key: 'git', def: () => !argv.includes('--no-git'), ask: (a, back) => confirm('Initialize a git repository?', a.git ?? true, back) },
+]
+
+// Walk the steps. Esc, Backspace or the left arrow goes back to the last question that was asked;
+// steps answered by flags or skipped by an earlier answer are not revisited.
+const a = {}
+const history = []
+for (let i = 0; i < steps.length; ) {
+  const s = steps[i]
+  if (s.when && !s.when(a)) {
+    a[s.key] = s.skip
+    i++
+    continue
+  }
+  const fixed = s.given ? s.given() : flag(s.key)
+  if (fixed !== undefined || !interactive) {
+    const v = fixed !== undefined ? (s.list ? list(parse(fixed)) : parse(fixed)) : s.def(a)
+    const err = s.validate?.(v, a)
+    if (err) {
+      console.error(`\n  ${err}\n`)
+      process.exit(1)
+    }
+    a[s.key] = v
+    i++
+    continue
+  }
+  const v = await s.ask(a, history.length > 0)
+  if (v === BACK) {
+    i = history.pop()
+    continue
+  }
+  const err = s.validate?.(v, a)
+  if (err) {
+    console.log(`  ${err}`)
+    continue
+  }
+  a[s.key] = v
+  history.push(i)
+  i++
+}
+
+const { name, template, frontend, css, icons, motion, orm, db, auth, twofa, email, i18n, admin, cookies, pwa, deploy, pm, install, git } = a
 const dir = resolve(name)
-if (existsSync(dir) && readdirSync(dir).length && !argv.includes('--force')) {
-  console.error(`\n  ${col.r('error[RK0801]')}: folder ${name} is not empty\n  = help: pick another name or pass --force\n`)
-  process.exit(1)
-}
-
-const template = await ask('template', () => select('Template', [{ value: 'full', label: 'Full', hint: 'pages, API, chat over WebSocket, everything you pick below' }, { value: 'minimal', label: 'Minimal', hint: 'one page and one API route' }]), 'full')
-const frontend = await ask('frontend', () => select('Frontend', FRONTENDS), 'raiko')
-const css = await ask('css', () => select('CSS', CSS.filter((c) => !c.only || c.only.includes(frontend))), 'monsoon')
-if (css === 'stylex' && frontend !== 'react') {
-  console.error(`  ${col.r('error[RK0802]')}: StyleX needs the React frontend\n  = help: pick --frontend react, or another CSS option`)
-  process.exit(1)
-}
-const icons = await ask('icons', () => select('Icons', ICONS.filter((c) => !c.only || c.only.includes(frontend))), 'glyphfox')
-const motion = await ask('motion', () => confirm('Animations with Motion (formerly Framer Motion)?', false), false)
-const orm = await ask('orm', () => select('Database ORM', [{ value: 'kastor', label: 'Kastor', hint: 'TypeScript ORM, no codegen' }, { value: 'prisma', label: 'Prisma' }, { value: 'drizzle', label: 'Drizzle' }, { value: 'none', label: 'No database' }]), 'none')
-const db = orm === 'none' ? 'none' : await ask('db', () => select('Database', [{ value: 'sqlite', label: 'SQLite', hint: 'a file, no server needed' }, { value: 'postgres', label: 'PostgreSQL' }]), 'sqlite')
-const auth = list(await ask('auth', () => multiselect('Sign in methods', [{ value: 'credentials', label: 'Email and password' }, { value: 'github', label: 'GitHub' }, { value: 'google', label: 'Google' }, { value: 'discord', label: 'Discord' }, { value: 'gitlab', label: 'GitLab' }], ['credentials']), []))
-const twofa = auth.length ? await ask('twofa', () => confirm('Two factor auth with Google Authenticator (TOTP)?', true), false) : false
-const email = await ask('email', () => select('Email provider', [{ value: 'resend', label: 'Resend' }, { value: 'postmark', label: 'Postmark' }, { value: 'sendgrid', label: 'SendGrid' }, { value: 'smtp', label: 'SMTP', hint: 'any server, via nodemailer' }, { value: 'none', label: 'None for now', hint: 'emails print in the terminal' }]), 'none')
-const i18n = await ask('i18n', () => confirm('Translations (en, pt-BR, es, fr, de)?', false), false)
-const admin = orm === 'none' ? false : await ask('admin', () => confirm('Admin panel at /admin?', true), true)
-
-let roles = { admin: ROLE_PRESETS.admin }
-if (admin) {
-  const picked = list(await ask('roles', () => multiselect('Admin roles (admin always has full access)', [{ value: 'editor', label: 'editor', hint: 'manage posts, read users' }, { value: 'support', label: 'support', hint: 'read and fix users, cannot list or delete' }, { value: 'viewer', label: 'viewer', hint: 'read only' }], ['editor']), 'editor'))
-  for (const r of picked) if (ROLE_PRESETS[r]) roles[r] = ROLE_PRESETS[r]
-}
-const cookies = await ask('cookies', () => select('Cookie consent banner (cookieowl)', [{ value: 'none', label: 'None' }, { value: 'lgpd', label: 'LGPD', hint: 'Brazil, Portuguese texts' }, { value: 'gdpr', label: 'GDPR', hint: 'Europe, visitor language' }]), 'none')
-const pwa = await ask('pwa', () => confirm('Installable app with offline support (installkite)?', false), false)
-const deploy = await ask('deploy', () => select('Deploy target', [{ value: 'vercel', label: 'Vercel' }, { value: 'cloudflare', label: 'Cloudflare Workers' }, { value: 'docker', label: 'Docker', hint: 'Fly, Railway, Render, any VPS' }, { value: 'node', label: 'Plain server', hint: 'bun or node on your machine' }]), 'docker')
-const pm = await ask('pm', () => select('Package manager', [{ value: detectedPm, label: detectedPm, hint: 'detected' }, ...['bun', 'npm', 'pnpm', 'yarn'].filter((p) => p !== detectedPm).map((p) => ({ value: p, label: p }))]), detectedPm)
-const install = await ask('install', () => confirm('Install dependencies now?', true), !argv.includes('--no-install'))
-const git = await ask('git', () => confirm('Initialize a git repository?', true), !argv.includes('--no-git'))
+const roles = { admin: ROLE_PRESETS.admin }
+for (const r of a.roles ?? []) if (ROLE_PRESETS[r]) roles[r] = ROLE_PRESETS[r]
 
 const o = { name: basename(dir), template, frontend, css, icons, motion, orm, db, auth, twofa, email, i18n, admin, roles, cookies, pwa, deploy, pm }
 if (flag('dry') !== undefined) {
