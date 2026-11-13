@@ -1,6 +1,6 @@
 {
   "name": "raiko.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The full stack TypeScript framework: Next.js style app router, server components, typed API, WebSockets with encryption, auth, admin and email. Runs on Bun, Node, Deno, Cloudflare Workers and Vercel.",
   "type": "module",
   "license": "MIT",

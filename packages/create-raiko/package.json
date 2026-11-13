@@ -1,14 +1,35 @@
 {
   "name": "create-raiko",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create a Raiko.js app: pick your frontend, CSS, database, auth, email, i18n and deploy target.",
   "type": "module",
-  "bin": { "create-raiko": "./index.mjs" },
-  "files": ["index.mjs", "prompt.mjs", "templates.mjs", "templates-common.mjs", "README.md"],
-  "engines": { "node": ">=20" },
+  "bin": {
+    "create-raiko": "./index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "prompt.mjs",
+    "templates.mjs",
+    "templates-common.mjs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "license": "MIT",
   "author": "Alexandre Kohler (https://github.com/kwy404)",
   "homepage": "https://kwy404.github.io/Raiko.js/",
-  "repository": { "type": "git", "url": "git+https://github.com/kwy404/Raiko.js.git", "directory": "packages/create-raiko" },
-  "keywords": ["raiko", "create", "scaffold", "template", "fullstack", "typescript"]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwy404/Raiko.js.git",
+    "directory": "packages/create-raiko"
+  },
+  "keywords": [
+    "raiko",
+    "create",
+    "scaffold",
+    "template",
+    "fullstack",
+    "typescript"
+  ]
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1
+
+- Client: `RaikoClientSocket` accepts a `WebSocket` implementation, so the client works on Node 20 with the ws package (the server never needed one).
+- App router: layouts without a `<head>` now get the page title and meta tags.
+- Performance: the client IP and the URL path are read only when a handler uses them; JSON responses go through the runtime's native `Response.json`.
+- Benchmarks: competitors live in `bench/package.json`, so the package has no dependency on them.
+- Website: new design.
+
 ## 1.0.0
 
 First release.
