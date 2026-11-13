@@ -1,0 +1,128 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800&family=Geist+Mono:wght@400;600&display=swap">
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#0a0a0b}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#0a0a0b;color:#ededed;font-family:Geist,system-ui,sans-serif}
+.grid{position:absolute;inset:0;background-image:linear-gradient(#18181b 2px,transparent 2px),linear-gradient(90deg,#18181b 2px,transparent 2px);background-size:90px 90px;opacity:.55}
+.glow{position:absolute;width:1300px;height:1300px;left:-110px;top:420px;background:radial-gradient(circle,rgba(255,210,63,.20),transparent 60%)}
+.cap{position:absolute;left:70px;right:70px;top:150px;font-weight:800;font-size:92px;line-height:1.02;letter-spacing:-3px}
+.cap .y{color:#ffd23f}.sub{position:absolute;left:74px;right:74px;top:440px;font-size:44px;color:#a1a1aa;line-height:1.25}
+.scene{position:absolute;inset:0;opacity:0}
+.card{position:absolute;width:420px;height:150px;border:2px solid #27272a;border-radius:24px;background:#111113;display:flex;align-items:center;gap:22px;padding:0 30px;font:600 40px Geist}
+.card i{width:20px;height:20px;border-radius:50%;background:#52525b}
+.term{position:absolute;left:70px;right:70px;border:2px solid #27272a;border-radius:26px;background:#09090b;font:500 36px/1.6 "Geist Mono",monospace;padding:30px 36px;white-space:pre;overflow:hidden}
+.term .q{color:#22d3ee}.term .a{color:#ffd23f}.term .ok{color:#4ade80}.term .d{color:#71717a}.term .r{color:#ff5f56;font-weight:600}.term .k{color:#c792ea}.term .s{color:#c3e88d}
+.label{position:absolute;font:600 30px "Geist Mono";color:#71717a}
+.browser{position:absolute;left:70px;right:70px;border:2px solid #27272a;border-radius:26px;background:#fafafa;color:#0a0a0b;overflow:hidden}
+.browser .bar{height:70px;background:#e4e4e7;display:flex;align-items:center;padding:0 26px;gap:12px;font:500 28px "Geist Mono";color:#52525b}
+.browser .bar i{width:18px;height:18px;border-radius:50%;background:#a1a1aa}
+.browser .page{padding:36px 44px;font-size:38px}.browser li{margin:8px 0}
+.chat{position:absolute;width:450px;height:560px;border:2px solid #27272a;border-radius:26px;background:#111113;padding:26px;font-size:34px}
+.bubble{background:#27272a;border-radius:20px;padding:12px 20px;margin:12px 0;display:inline-block}
+.bubble.me{background:#ffd23f;color:#0a0a0b;float:right;clear:both}
+.hex{position:absolute;left:70px;right:70px;height:300px;border:2px solid #3f1d1d;border-radius:26px;background:#09090b;font:500 30px/1.5 "Geist Mono";color:#f87171;padding:24px 30px;overflow:hidden;white-space:pre-wrap;word-break:break-all}
+.tbl{position:absolute;left:70px;right:70px;border:2px solid #27272a;border-radius:26px;background:#111113;overflow:hidden;font-size:36px}
+.tbl div{display:flex;padding:22px 30px;border-bottom:2px solid #1f1f23}.tbl b{flex:1}
+.badge{display:inline-block;background:#ffd23f;color:#0a0a0b;border-radius:999px;padding:6px 22px;font-weight:700}
+.big{position:absolute;left:0;right:0;text-align:center;font-weight:800;letter-spacing:-4px}
+.mascot{position:absolute}
+.cta{position:absolute;left:70px;right:70px;text-align:center;font:600 48px "Geist Mono";color:#ffd23f}
+</style></head>
+<body><div id="stage">
+<div class="grid"></div><div class="glow"></div>
+
+<div class="scene" id="s1"><div class="cap">Eu usava <span class="y">6 ferramentas</span> para fazer 1 app.</div></div>
+<div class="scene" id="s2"><div class="cap">Agora é <span class="y">1</span>.</div><img class="mascot" id="m2" src="mascot.svg" width="620"></div>
+<div class="scene" id="s3"><div class="cap">Um comando.</div><div class="sub">Front, banco, login, 2FA, admin e e-mail.</div>
+  <div class="label" style="left:74px;top:600px">npm</div><div class="term" id="t3a" style="top:650px;height:520px"></div>
+  <div class="label" style="left:74px;top:1220px">bun</div><div class="term" id="t3b" style="top:1270px;height:420px"></div></div>
+<div class="scene" id="s4"><div class="cap">A página <span class="y">lê o banco</span> direto.</div><div class="sub">Sem API no meio. Zero JS no navegador.</div>
+  <div class="term" id="t4" style="top:600px;height:560px;font-size:31px"></div>
+  <div class="browser" id="b4" style="top:1220px;height:560px"><div class="bar"><i></i><i></i><i></i>&nbsp;localhost:3000</div><div class="page"><b style="font-size:48px">Products</b><ul><li>Raiko hoodie  <b>$59</b></li><li>Bolt mug  <b>$19</b></li><li>Fox stickers  <b>$5</b></li></ul></div></div></div>
+<div class="scene" id="s5"><div class="cap">O erro diz <span class="y">como corrigir</span>.</div><div class="term" id="t5" style="top:560px;height:720px;font-size:32px;white-space:pre"></div></div>
+<div class="scene" id="s6"><div class="cap">WebSocket <span class="y">criptografado</span>.</div><div class="sub">Bun, Node, Deno e Cloudflare.</div>
+  <div class="chat" id="c6a" style="left:70px;top:600px"></div><div class="chat" id="c6b" style="right:70px;top:600px"></div>
+  <div class="label" style="left:74px;top:1240px">o que trafega na rede</div><div class="hex" id="h6" style="top:1290px"></div></div>
+<div class="scene" id="s7"><div class="cap">Permissão <span class="y">por ação</span>.</div><div class="sub">Não só por tela.</div>
+  <div class="tbl" id="t7" style="top:620px"></div><div class="term" id="r7" style="top:1290px;height:300px"></div></div>
+<div class="scene" id="s8"><div class="cap">Testei até quebrar.</div>
+  <div class="big" id="n8a" style="top:620px;font-size:200px;color:#ffd23f"></div><div class="big" style="top:850px;font-size:52px;letter-spacing:0;color:#a1a1aa">vulnerabilidades achadas e corrigidas</div>
+  <div class="big" id="n8b" style="top:1060px;font-size:170px"></div><div class="big" style="top:1260px;font-size:52px;letter-spacing:0;color:#a1a1aa">verificações automáticas</div>
+  <div class="big" style="top:1420px;font-size:52px;letter-spacing:0;color:#4ade80">108 testes. 11 templates. 0 falhas.</div></div>
+<div class="scene" id="s8b"><div class="cap">Mesma página. <span class="y">Mesmo Node.</span></div>
+  <div class="label" style="left:74px;top:640px;font-size:40px;color:#ededed">Raiko.js</div><div id="bar1" style="position:absolute;left:70px;top:700px;height:110px;border-radius:20px;background:linear-gradient(90deg,#ffd23f,#ff9a3c)"></div><div class="label" id="v1" style="left:74px;top:830px;font-size:44px;color:#ffd23f"></div>
+  <div class="label" style="left:74px;top:960px;font-size:40px;color:#ededed">Next.js 15</div><div id="bar2" style="position:absolute;left:70px;top:1020px;height:110px;border-radius:20px;background:#52525b"></div><div class="label" id="v2" style="left:74px;top:1150px;font-size:44px"></div>
+  <div class="big" id="x8" style="top:1330px;font-size:190px;color:#ffd23f"></div><div class="big" style="top:1560px;font-size:46px;letter-spacing:0;color:#a1a1aa">páginas renderizadas por segundo</div></div>
+<div class="scene" id="s9"><img class="mascot" id="m9" src="mascot.svg" width="560" style="left:260px;top:300px">
+  <div class="big" style="top:960px;font-size:130px">raiko<span style="color:#71717a">.js</span></div>
+  <div class="cta" style="top:1170px">npx create-raiko@latest</div>
+  <div class="big" style="top:1330px;font-size:54px;letter-spacing:0;color:#a1a1aa">Open source. Link no comentário.</div>
+  <div class="big" style="top:1520px;font-size:62px;letter-spacing:-1px">Qual das 6 você trocaria primeiro?</div></div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id)
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x))
+const ease = (x) => 1 - Math.pow(1 - clamp(x), 3)
+const SCENES = [['s1', 0, 2.2], ['s2', 2.2, 4.4], ['s3', 4.4, 9.6], ['s4', 9.6, 14.6], ['s5', 14.6, 19.4], ['s6', 19.4, 25.2], ['s7', 25.2, 31], ['s8', 31, 35], ['s8b', 35, 38.5], ['s9', 38.5, 42.5]]
+const TOOLS = ['Next.js', 'Express', 'NextAuth', 'Socket.io', 'AdminJS', 'Nodemailer']
+const POS = [[70, 640], [590, 640], [70, 840], [590, 840], [70, 1040], [590, 1040]]
+const s1 = $('s1'), s2 = $('s2')
+const cards = TOOLS.map((t, i) => { const c = document.createElement('div'); c.className = 'card'; c.innerHTML = `<i></i>${t}`; c.style.left = POS[i][0] + 'px'; c.style.top = POS[i][1] + 'px'; $('stage').appendChild(c); return c })
+const type = (text, t, speed = 40) => text.slice(0, Math.floor(clamp(t) * text.length * 1) )
+const lines = (arr, t, per = 0.25) => arr.slice(0, Math.floor(t / per)).join('\n')
+const T3A = ['<span class="d">$</span> npx create-raiko@latest my-app', '<span class="q">?</span> Frontend <span class="a">Raiko Pages + Voodoo.js</span>', '<span class="q">?</span> CSS <span class="a">Monsoon</span>', '<span class="q">?</span> Database <span class="a">Kastor + SQLite</span>', '<span class="q">?</span> Sign in <span class="a">Email, GitHub</span>', '<span class="q">?</span> 2FA <span class="a">Google Authenticator</span>', '<span class="q">?</span> Admin <span class="a">yes</span>', '  <span class="ok">ok</span> 41 files, installed']
+const T3B = ['<span class="d">$</span> bun create raiko my-app', '  <span class="ok">ok</span> same questions, same app', '<span class="d">$</span> npm run dev', '  <span class="ok">ready</span> localhost:3000']
+const T4 = ['<span class="d">// app/page.tsx</span>', '<span class="k">export default async function</span> Page() {', '  <span class="k">const</span> products = <span class="k">await</span> db.products', '    .findMany()', '  <span class="k">return</span> &lt;ul&gt;{products.map(p =&gt;', '    &lt;li&gt;{p.name} <span class="s">${p.price}</span>&lt;/li&gt;', '  )}&lt;/ul&gt;', '}']
+const T5 = ['<span class="r">error[RK0104]</span>: two routes use different', '  param names at the same position', '  <span class="q">--></span> app/blog/[slug]/page.tsx', '   <span class="d">|</span>', ' 3 <span class="d">|</span>   app/blog/<span class="r">[id]</span>/page.tsx', '   <span class="d">|</span>            <span class="r">^^^^</span> already [slug]', '   <span class="d">|</span>', '   <span class="d">=</span> <span class="ok">help</span>: rename the folder to [slug]']
+const HEX = '0000000000000004 9f3ac1e27b55d0a4 c18e6f02b9d7e3a1 44f0cc917a2e5b38 e7d2a90f1c4b6e85 2b7f03d9a6c1e840 7d1e9f5ac2b03e64 a90c4f71d2e8b356 '
+const T7 = [['role', 'list', 'read', 'update', 'delete'], ['admin', 'sim', 'sim', 'sim', 'sim'], ['support', 'não', 'sim', 'sim', 'não'], ['viewer', 'sim', 'sim', 'não', 'não']]
+const R7 = ['<span class="d">support$</span> GET /admin/users/7', '  <span class="ok">200</span> ana@raiko.dev  (pode editar)', '<span class="d">support$</span> GET /admin/users', '  <span class="r">403</span> Your role cannot list this resource']
+
+window.render = (t) => {
+  for (const [id, a, b] of SCENES) {
+    const el = $(id), local = t - a, len = b - a
+    el.style.opacity = local < 0 || local > len ? 0 : Math.min(ease(local / 0.25), ease((len - local) / 0.2))
+  }
+  // s1/s2: tool cards appear, then fly away one by one
+  cards.forEach((c, i) => {
+    const appear = ease((t - i * 0.12) / 0.3)
+    const out = ease((t - 2.4 - i * 0.18) / 0.35)
+    c.style.opacity = t > 4.6 ? 0 : appear * (1 - out)
+    c.style.transform = `translateY(${(1 - appear) * 60}px) translateX(${out * (i % 2 ? 900 : -900)}px) rotate(${out * (i % 2 ? 20 : -20)}deg)`
+  })
+  const m2 = ease((t - 3.1) / 0.5)
+  $('m2').style.left = '230px'; $('m2').style.top = 520 + (1 - m2) * 300 + 'px'; $('m2').style.transform = `scale(${0.6 + m2 * 0.4}) rotate(${(1 - m2) * -12}deg)`
+  // s3
+  $('t3a').innerHTML = lines(T3A, (t - 4.6) * 1, 0.42)
+  $('t3b').innerHTML = lines(T3B, (t - 6.8) * 1, 0.55)
+  // s4
+  $('t4').innerHTML = lines(T4, t - 9.8, 0.38)
+  const b4 = ease((t - 12.4) / 0.6); $('b4').style.opacity = b4; $('b4').style.transform = `translateY(${(1 - b4) * 80}px)`
+  // s5
+  $('t5').innerHTML = lines(T5, t - 15, 0.32)
+  // s6
+  const msgs = [['a', 'oi! tudo certo?'], ['b', 'tudo, e você?'], ['a', 'cartão 4242 4242...'], ['b', 'recebido']]
+  const shown = msgs.slice(0, clamp(Math.floor((t - 19.8) / 0.9), 0, 4))
+  $('c6a').innerHTML = shown.map(([w, m]) => `<span class="bubble ${w === 'a' ? 'me' : ''}">${m}</span>`).join('<br>')
+  $('c6b').innerHTML = shown.map(([w, m]) => `<span class="bubble ${w === 'b' ? 'me' : ''}">${m}</span>`).join('<br>')
+  $('h6').textContent = HEX.repeat(4).slice(0, clamp(Math.floor((t - 20) * 60), 0, 520))
+  // s7
+  $('t7').innerHTML = T7.map((r, i) => `<div>${r.map((c, j) => (j === 0 ? `<b>${i === 2 ? '<span class="badge">support</span>' : c}</b>` : `<span style="width:150px;color:${c === 'não' ? '#f87171' : c === 'sim' ? '#4ade80' : '#a1a1aa'}">${c}</span>`)).join('')}</div>`).join('')
+  $('r7').innerHTML = lines(R7, t - 27, 0.7)
+  // s8 counters
+  const k = ease((t - 31.3) / 2.2)
+  $('n8a').textContent = Math.round(21 * k)
+  $('n8b').textContent = Math.round(3400000 * k).toLocaleString('en-US')
+  // s8b speed bars
+  const kb = ease((t - 35.3) / 1.6)
+  $('bar1').style.width = 940 * kb + 'px'
+  $('bar2').style.width = Math.max(6, 940 * kb * (155 / 3737)) + 'px'
+  $('v1').textContent = Math.round(3737 * kb).toLocaleString('pt-BR') + ' /s'
+  $('v2').textContent = Math.round(155 * kb) + ' /s'
+  $('x8').textContent = kb > 0.98 ? '24x' : ''
+  // s9 mascot wave
+  $('m9').style.transform = `rotate(${Math.sin(t * 6) * 4}deg) translateY(${Math.sin(t * 3) * 10}px)`
+}
+window.ready = document.fonts.ready.then(() => window.render(0))
+</script></body></html>

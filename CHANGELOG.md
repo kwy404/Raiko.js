@@ -1,0 +1,18 @@
+# Changelog
+
+## 1.0.0
+
+First release.
+
+- Core: radix router with a static fast path, typed context, lifecycle hooks with local and global scope, plugins, groups, mount, `t` schemas with coercion and Standard Schema support, RFC 9457 errors.
+- Responses: JSON, text, TSX, SSE from generators, streams, files, `status()` typed per code.
+- App router: page, layout, loading, error, not-found, forbidden, unauthorized, route and socket files; metadata, actions, revalidate, middleware, locales, protected pages, sitemap and robots, dev overlay and DevTools.
+- Components: Link, Image, Script, Head, JsonLd, SkipLink, Form.
+- WebSockets on Bun, Node (own RFC 6455), Deno and Workers; rooms; validation; ECDH and AES-GCM encryption with replay protection; WebRTC P2P.
+- Auth: OAuth with PKCE, credentials with PBKDF2, TOTP 2FA, JWT sessions.
+- Admin panel with permissions per role and action, adapters for Kastor, Prisma and Drizzle.
+- Email with TSX templates, preview, and Resend, Postmark, SendGrid and SMTP transports.
+- i18n with typed keys and plurals.
+- Plugins: cors, secureHeaders, rateLimit, csrf, logger, requestId, compress, etag, responseCache, health, staticFiles, openapi.
+- Typed client, React and Vue hooks, Vite plugin, `raiko` CLI, `create-raiko` with 11 tested templates.
+- Performance: compiled fast paths per route, context free constant routes, Bun native routes, cluster mode.

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-label="Raiko.js: backend and frontend in one file tree, every runtime">
+  <defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0v40" fill="none" stroke="#f4f4f5" stroke-width="1"/></pattern>
+  <linearGradient id="a" x1="0" x2="1"><stop offset="0" stop-color="#ffd23f"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+  <rect width="1200" height="360" fill="#ffffff"/><rect width="1200" height="360" fill="url(#g)"/>
+  <circle cx="980" cy="180" r="170" fill="#ffd23f" opacity=".12"/>
+  <svg x="860" y="40" width="250" height="270" viewBox="0 0 240 260">
+  
+  <defs>
+    <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a3c"/><stop offset="1" stop-color="#f06a1e"/></linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#ffd23f"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".55" r=".55"><stop offset="0" stop-color="#ffd23f" stop-opacity=".35"/><stop offset="1" stop-color="#ffd23f" stop-opacity="0"/></radialGradient>
+  </defs>
+  <circle cx="120" cy="140" r="118" fill="url(#glow)"/>
+  <!-- tail -->
+  <path d="M170 210c40-6 62-34 56-70-10 22-30 30-48 30 10 12 6 30-8 40z" fill="url(#hair)"/>
+  <path d="M214 150c-6 14-16 22-28 26 6 4 10 10 10 16 14-8 20-24 18-42z" fill="#fff5e6"/>
+  <!-- body -->
+  <path d="M82 196c0-20 17-34 38-34s38 14 38 34v30c0 8-6 14-14 14H96c-8 0-14-6-14-14z" fill="#1f1f2e"/>
+  <path d="M104 240v12M136 240v12" stroke="#1f1f2e" stroke-width="10" stroke-linecap="round"/>
+  <!-- scarf -->
+  <path d="M78 176c26 12 58 12 84 0l4 14c-28 14-64 14-92 0z" fill="url(#bolt)"/>
+  <path d="M150 186l26 26-10 4-8-12-4 18-10-2 4-22z" fill="url(#bolt)"/>
+  <!-- left ear (fox) -->
+  <path d="M58 70 50 18 96 48z" fill="url(#hair)"/>
+  <path d="M62 60 58 32 84 50z" fill="#fff5e6"/>
+  <!-- right ear (lightning) -->
+  <path d="M150 46 188 10 176 44 196 40 160 82 170 54z" fill="url(#bolt)" stroke="#e8b400" stroke-width="2" stroke-linejoin="round"/>
+  <!-- head -->
+  <ellipse cx="120" cy="112" rx="70" ry="64" fill="#ffe8d6"/>
+  <!-- hair -->
+  <path d="M50 108c-4-40 26-66 70-66s76 26 70 66c-10-18-22-26-34-28 4 8 4 16 0 22-10-14-26-22-44-22 2 8 0 16-6 22-6-12-16-18-28-18-10 6-20 14-28 24z" fill="url(#hair)"/>
+  <!-- eyes -->
+  <ellipse cx="94" cy="120" rx="11" ry="14" fill="#1f1f2e"/>
+  <ellipse cx="146" cy="120" rx="11" ry="14" fill="#1f1f2e"/>
+  <circle cx="98" cy="114" r="4.5" fill="#fff"/>
+  <circle cx="150" cy="114" r="4.5" fill="#fff"/>
+  <circle cx="90" cy="126" r="2" fill="#ffd23f"/>
+  <circle cx="142" cy="126" r="2" fill="#ffd23f"/>
+  <!-- cheeks and mouth -->
+  <ellipse cx="78" cy="138" rx="9" ry="5" fill="#ff9aa2" opacity=".6"/>
+  <ellipse cx="162" cy="138" rx="9" ry="5" fill="#ff9aa2" opacity=".6"/>
+  <path d="M112 140q8 8 16 0" fill="none" stroke="#1f1f2e" stroke-width="3" stroke-linecap="round"/>
+  <!-- spark -->
+  <path d="M206 92l6-14 2 10 10-2-14 16 2-10z" fill="#ffd23f"/>
+  <path d="M28 150l4-10 2 7 7-2-10 11 1-7z" fill="#ffd23f" opacity=".8"/>
+</svg>
+  <text x="80" y="160" font-family="Geist, Inter, ui-sans-serif, system-ui, sans-serif" font-size="96" font-weight="800" fill="#0a0a0b" letter-spacing="-3">raiko<tspan fill="#52525b">.js</tspan></text>
+  <text x="84" y="220" font-family="Geist, Inter, ui-sans-serif, system-ui, sans-serif" font-size="30" fill="#52525b">Backend and frontend in one file tree.</text>
+  <text x="84" y="262" font-family="Geist, Inter, ui-sans-serif, system-ui, sans-serif" font-size="30" fill="#52525b">Every runtime. Strikes first.</text>
+  <rect x="84" y="290" width="300" height="4" rx="2" fill="url(#a)"/>
+</svg>

@@ -1,0 +1,24 @@
+{
+  "kind": "http",
+  "runtime": "bun 1.4.4",
+  "client": "autocannon -c 64 -p 4",
+  "rounds": 3,
+  "seconds": 6,
+  "results": {
+    "text": {
+      "raiko.js": 99040,
+      "elysia": 83192,
+      "hono": 63920
+    },
+    "params + json": {
+      "raiko.js": 66943,
+      "elysia": 75723,
+      "hono": 60477
+    },
+    "json body": {
+      "raiko.js": 51136,
+      "elysia": 53168,
+      "hono": 47029
+    }
+  }
+}

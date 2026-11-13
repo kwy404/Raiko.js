@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentação | Raiko.js</title><meta name="description" content="Raiko.js documentation: app router, server components, typed API, WebSockets, auth, admin, email.">
+<link rel="icon" href="../logo.svg"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800&family=Geist+Mono&display=swap">
+<link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="docs.css"></head>
+<body><a class="skip" href="#doc">Skip to content</a>
+<header class="nav"><div class="wrap"><a class="brand" href="../"><img src="../logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a>
+<div class="sp"></div><a class="ghost lang" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none">EN</a><a class="ghost lang on" href="pt.html" style="display:inline-flex;align-items:center;text-decoration:none">PT</a><a class="ghost lang" href="es.html" style="display:inline-flex;align-items:center;text-decoration:none">ES</a><a class="ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
+<div class="docs"><aside><nav aria-label="Sections"><a href="#comece-com-um-comando">Comece com um comando</a><a href="#o-tour-de-30-segundos">O tour de 30 segundos</a><a href="#conteúdo">Conteúdo</a><a href="#por-que-raiko">Por que Raiko</a><a href="#rotas-e-handlers">Rotas e handlers</a><a href="#validação">Validação</a><a href="#hooks-de-ciclo-de-vida">Hooks de ciclo de vida</a><a href="#estado-decorators-e-plugins">Estado, decorators e plugins</a><a href="#respostas-e-streaming">Respostas e streaming</a><a href="#app-router">App router</a><a href="#páginas-protegidas">Páginas protegidas</a><a href="#componentes">Componentes</a><a href="#client-tipado-e-hooks">Client tipado e hooks</a><a href="#websockets">WebSockets</a><a href="#autenticação-e-2fa">Autenticação e 2FA</a><a href="#painel-admin">Painel admin</a><a href="#email">Email</a><a href="#traduções">Traduções</a><a href="#plugins-embutidos">Plugins embutidos</a><a href="#erros-que-mostram-a-correção">Erros que mostram a correção</a><a href="#qualquer-frontend">Qualquer frontend</a><a href="#deploy">Deploy</a><a href="#segurança">Segurança</a><a href="#benchmarks">Benchmarks</a><a href="#comparação">Comparação</a><a href="#problemas-do-nextjs-que-ele-resolve">Problemas do Next.js que ele resolve</a><a href="#testes">Testes</a><a href="#mais-projetos-de-kwy404">Mais projetos de kwy404</a><a href="#autor">Autor</a><a href="#licença">Licença</a><a href="errors.html">Error codes</a></nav></aside><main id="doc" class="md"><h1>Documentação</h1><h2 id="comece-com-um-comando">Comece com um comando</h2><pre><code class="language-bash">npx create-raiko@latest my-app
+# or
+bun create raiko my-app
+</code></pre>
+<p>O instalador pergunta o que você quer e gera um projeto que já funciona: frontend (Raiko Pages com Voodoo.js, React, Vue, Svelte, Solid, Preact ou Angular), CSS (Monsoon, Tailwind, StyleX, UnoCSS), ícones, banco de dados (Kastor, Prisma ou Drizzle sobre SQLite ou PostgreSQL), login (email e senha, GitHub, Google, Discord, GitLab), autenticação em dois fatores, provedor de email, traduções, papéis de admin, banner de cookies, app instalável e destino de deploy. Toda combinação é instalada, checada nos tipos, compilada e executada no CI.</p>
+<pre><code class="language-bash">cd my-app
+npm run dev
+</code></pre>
+<h2 id="o-tour-de-30-segundos">O tour de 30 segundos</h2><p>Uma API com validação, tipos e documentação OpenAPI a partir de um único schema:</p>
+<pre><code class="language-ts">import { Raiko, t } from &#39;raiko.js&#39;
+
+const app = new Raiko()
+  .get(&#39;/&#39;, &#39;Hello&#39;)
+  .get(&#39;/users/:id&#39;, ({ params }) =&gt; ({ id: params.id }))
+  .post(&#39;/users&#39;, ({ body, status }) =&gt; status(201, { id: 1, ...body }), {
+    body: t.Object({ email: t.String({ format: &#39;email&#39; }), name: t.String({ minLength: 2 }) }),
+  })
+
+app.listen(3000)
+export default app
+</code></pre>
+<p>Uma página é um server component assíncrono. Ela lê o banco de dados e não envia nenhum JavaScript, a menos que você peça:</p>
+<pre><code class="language-tsx">// app/blog/[slug]/page.tsx
+import { notFound } from &#39;raiko.js/server&#39;
+import { db } from &#39;../../../db&#39;
+
+export const revalidate = 60
+export async function generateMetadata({ params }) {
+  return { title: params.slug }
+}
+
+export default async function Post({ params }) {
+  const post = await db.posts.findUnique({ where: { slug: params.slug } })
+  if (!post) notFound()
+  return &lt;article&gt;&lt;h1&gt;{post.title}&lt;/h1&gt;&lt;p&gt;{post.body}&lt;/p&gt;&lt;/article&gt;
+}
+</code></pre>
+<p>O client conhece cada rota, parâmetro, body e resposta:</p>
+<pre><code class="language-ts">import { client } from &#39;raiko.js/client&#39;
+import type { App } from &#39;./server&#39;
+
+const api = client&lt;App&gt;(&#39;https://api.example.com&#39;)
+const { data, error } = await api.post(&#39;/users&#39;, { body: { email: &#39;ana@raiko.dev&#39;, name: &#39;Ana&#39; } })
+//      ^ { id: number; email: string; name: string }    error.status is 422 with the exact field
+</code></pre>
+<h2 id="conteúdo">Conteúdo</h2><ul>
+<li><a href="#por-que-raiko">Por que Raiko</a></li>
+<li><a href="#rotas-e-handlers">Rotas e handlers</a></li>
+<li><a href="#valida%C3%A7%C3%A3o">Validação</a></li>
+<li><a href="#hooks-de-ciclo-de-vida">Hooks de ciclo de vida</a></li>
+<li><a href="#estado-decorators-e-plugins">Estado, decorators e plugins</a></li>
+<li><a href="#respostas-e-streaming">Respostas e streaming</a></li>
+<li><a href="#app-router">App router</a></li>
+<li><a href="#p%C3%A1ginas-protegidas">Páginas protegidas</a></li>
+<li><a href="#componentes">Componentes</a></li>
+<li><a href="#client-tipado-e-hooks">Client tipado e hooks</a></li>
+<li><a href="#websockets">WebSockets</a></li>
+<li><a href="#autentica%C3%A7%C3%A3o-e-2fa">Autenticação e 2FA</a></li>
+<li><a href="#painel-admin">Painel admin</a></li>
+<li><a href="#email">Email</a></li>
+<li><a href="#tradu%C3%A7%C3%B5es">Traduções</a></li>
+<li><a href="#plugins-embutidos">Plugins embutidos</a></li>
+<li><a href="#erros-que-mostram-a-corre%C3%A7%C3%A3o">Erros que mostram a correção</a></li>
+<li><a href="#qualquer-frontend">Qualquer frontend</a></li>
+<li><a href="#deploy">Deploy</a></li>
+<li><a href="#seguran%C3%A7a">Segurança</a></li>
+<li><a href="#benchmarks">Benchmarks</a></li>
+<li><a href="#compara%C3%A7%C3%A3o">Comparação</a></li>
+<li><a href="#problemas-do-nextjs-que-ele-resolve">Problemas do Next.js que ele resolve</a></li>
+<li><a href="#testes">Testes</a></li>
+</ul>
+<h2 id="por-que-raiko">Por que Raiko</h2><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>App router como no Next.js</strong></td>
+<td>Arquivos <code>page</code>, <code>layout</code>, <code>loading</code>, <code>error</code>, <code>not-found</code>, <code>forbidden</code>, <code>unauthorized</code>, <code>route</code> e <code>socket</code>, metadata, form actions e ISR.</td>
+</tr>
+<tr>
+<td><strong>Server components sem React</strong></td>
+<td>TSX assíncrono renderizado em string ou em stream com <code>&lt;Suspense&gt;</code>. Zero JavaScript no cliente por padrão.</td>
+</tr>
+<tr>
+<td><strong>Interatividade sem build</strong></td>
+<td>Coloque <code>v-data</code> e <code>v-on:click</code> no seu TSX e o Voodoo.js é adicionado só naquela página.</td>
+</tr>
+<tr>
+<td><strong>Tipos do servidor ao cliente</strong></td>
+<td>Params, query, body e cada status de resposta chegam ao <code>client&lt;App&gt;()</code>. Sem geração de código.</td>
+</tr>
+<tr>
+<td><strong>WebSockets em todo runtime</strong></td>
+<td>Bun, Node (implementação própria do RFC 6455, sem dependências), Deno e Workers, com salas e validação.</td>
+</tr>
+<tr>
+<td><strong>Mensagens criptografadas</strong></td>
+<td><code>encrypt: true</code> adiciona troca de chaves ECDH e AES-GCM, com uma chave por direção e proteção contra replay.</td>
+</tr>
+<tr>
+<td><strong>P2P</strong></td>
+<td>Sinalização WebRTC e um client mesh para data channels e mídia.</td>
+</tr>
+<tr>
+<td><strong>Autenticação</strong></td>
+<td>OAuth com PKCE (GitHub, Google, Discord, GitLab, qualquer OAuth 2), credenciais com PBKDF2, 2FA via TOTP, sessões JWT assinadas.</td>
+</tr>
+<tr>
+<td><strong>Painel admin</strong></td>
+<td>CRUD, busca, ordenação e paginação com permissões por papel e por ação, para Kastor, Prisma e Drizzle.</td>
+</tr>
+<tr>
+<td><strong>Email</strong></td>
+<td>Templates em TSX com preview ao vivo, enviados via Resend, Postmark, SendGrid ou SMTP.</td>
+</tr>
+<tr>
+<td><strong>Erros como os do Rust</strong></td>
+<td>Todo erro tem código, arquivo e linha, o trecho do código-fonte e uma linha <code>help:</code>.</td>
+</tr>
+<tr>
+<td><strong>Rápido</strong></td>
+<td>Caminhos rápidos compilados por rota e o router nativo do Bun. Veja os <a href="#benchmarks">benchmarks</a>.</td>
+</tr>
+<tr>
+<td><strong>Testado para quebrar</strong></td>
+<td>107 testes, mais de 3,4 milhões de checagens de propriedades geradas, duas auditorias de segurança, 11 templates testados de ponta a ponta.</td>
+</tr>
+</tbody></table>
+<h2 id="rotas-e-handlers">Rotas e handlers</h2><pre><code class="language-ts">new Raiko()
+  .get(&#39;/&#39;, &#39;static text&#39;)                       // constant: served by Bun&#39;s native router, no JS per request
+  .get(&#39;/users/:id&#39;, ({ params }) =&gt; params.id)  // params are typed from the path
+  .get(&#39;/files/*&#39;, ({ params }) =&gt; params[&#39;*&#39;])  // wildcard
+  .get(&#39;/archive/:year?&#39;, ({ params }) =&gt; params.year ?? &#39;all&#39;)
+  .group(&#39;/v1&#39;, (v1) =&gt; v1.get(&#39;/health&#39;, &#39;ok&#39;))
+  .all(&#39;/echo&#39;, ({ request }) =&gt; request.method)
+  .route(&#39;PROPFIND&#39;, &#39;/dav&#39;, () =&gt; &#39;custom method&#39;)
+  .mount(&#39;/legacy&#39;, otherFetchHandler)           // mount Hono, another app, any fetch handler
+</code></pre>
+<p>O router é uma radix tree com um hash map na frente para caminhos estáticos, com backtracking para que a rota mais específica vença, além de <code>HEAD</code>, <code>OPTIONS</code> e <code>405</code> com header <code>Allow</code> automáticos.</p>
+<h2 id="validação">Validação</h2><p><code>t</code> cria schemas com inferência completa, converte strings vindas de params, query e formulários, e informa o caminho exato de cada problema:</p>
+<pre><code class="language-ts">import { t } from &#39;raiko.js&#39;
+
+const User = t.Object({
+  email: t.String({ format: &#39;email&#39; }),
+  age: t.Optional(t.Integer({ minimum: 13 })),
+  tags: t.Array(t.String(), { maxItems: 10 }),
+  role: t.Enum([&#39;user&#39;, &#39;admin&#39;]),
+})
+</code></pre>
+<p>Zod, Valibot e ArkType também funcionam, via Standard Schema: use-os em qualquer lugar onde caberia um schema <code>t</code>.</p>
+<p>Uma validação que falha responde <code>422</code> com problem details no formato RFC 9457:</p>
+<pre><code class="language-json">{ &quot;status&quot;: 422, &quot;detail&quot;: &quot;body.email: Expected a valid email&quot;, &quot;errors&quot;: [{ &quot;path&quot;: [&quot;email&quot;], &quot;on&quot;: &quot;body&quot; }] }
+</code></pre>
+<h2 id="hooks-de-ciclo-de-vida">Hooks de ciclo de vida</h2><p><code>onRequest</code>, <code>onParse</code>, <code>onTransform</code>, <code>derive</code>, validação, <code>resolve</code>, <code>onBeforeHandle</code>, handler, <code>onAfterHandle</code>, <code>mapResponse</code>, <code>onAfterResponse</code> e <code>onError</code>. Um hook vale para as rotas registradas depois dele. Passe <code>&#39;global&#39;</code> para aplicá-lo também ao app que usa o seu plugin.</p>
+<pre><code class="language-ts">app
+  .derive(({ headers }) =&gt; ({ token: headers.authorization?.slice(7) }))
+  .onBeforeHandle(({ token }) =&gt; (token ? undefined : new Response(&#39;Unauthorized&#39;, { status: 401 })))
+  .get(&#39;/me&#39;, ({ token }) =&gt; ({ token }))
+</code></pre>
+<h2 id="estado-decorators-e-plugins">Estado, decorators e plugins</h2><pre><code class="language-ts">const db = new Raiko({ name: &#39;db&#39; }).decorate(&#39;db&#39;, createDb()).state(&#39;hits&#39;, 0)
+
+const app = new Raiko()
+  .use(db)                                 // deduplicated by name
+  .get(&#39;/hits&#39;, ({ store }) =&gt; ++store.hits)
+  .get(&#39;/users&#39;, ({ db }) =&gt; db.users.findMany())
+</code></pre>
+<h2 id="respostas-e-streaming">Respostas e streaming</h2><p>Retorne qualquer coisa: objetos viram JSON, strings viram texto, JSX vira HTML, generators viram Server Sent Events, e <code>Blob</code>, <code>File</code>, <code>ReadableStream</code> e <code>Response</code> passam direto. <code>status(201, body)</code> define o código e tipa o client por status.</p>
+<pre><code class="language-ts">import { sse } from &#39;raiko.js&#39;
+
+app.get(&#39;/ticks&#39;, async function* () {
+  for (let i = 0; i &lt; 5; i++) yield sse({ i }, { event: &#39;tick&#39; })
+})
+</code></pre>
+<h2 id="app-router">App router</h2><pre><code>app/
+  layout.tsx            root layout, metadata
+  page.tsx              /
+  loading.tsx           streamed fallback while pages load
+  error.tsx             error boundary
+  not-found.tsx         404
+  forbidden.tsx         403
+  blog/[slug]/page.tsx  /blog/:slug
+  docs/[...path]/page.tsx
+  (marketing)/about/page.tsx   route group, not in the URL
+  api/users/route.ts    export GET, POST...
+  chat/socket.ts        WebSocket
+middleware.ts
+</code></pre>
+<pre><code class="language-ts">import { Raiko } from &#39;raiko.js&#39;
+import { appRouter } from &#39;raiko.js/app&#39;
+
+const app = new Raiko().use(await appRouter({ dir: &#39;./app&#39; }))
+</code></pre>
+<p>As páginas recebem <code>params</code> e <code>searchParams</code>, exportam <code>metadata</code> ou <code>generateMetadata</code>, <code>revalidate</code> para renderização em cache e <code>actions</code> para formulários (<code>&lt;Form action=&quot;like&quot;&gt;</code> envia para <code>?/like</code>). Dentro de qualquer componente: <code>headers()</code>, <code>cookies()</code>, <code>usePathname()</code>, <code>useParams()</code>, <code>useSearchParams()</code>, <code>currentUser()</code>, <code>notFound()</code>, <code>redirect()</code>, <code>forbidden()</code>, <code>unauthorized()</code>.</p>
+<p><code>sitemap.xml</code> e <code>robots.txt</code> são gerados a partir das suas páginas. Em desenvolvimento, toda página ganha um overlay de erros, um selo de DevTools (rota, params, tempo de renderização, cache) e um verificador de acessibilidade.</p>
+<h2 id="páginas-protegidas">Páginas protegidas</h2><pre><code class="language-tsx">// app/dashboard/page.tsx
+export const auth = true                 // signed in users only
+export default function Dashboard() { ... }
+
+// app/admin/layout.tsx
+export const roles = [&#39;admin&#39;]           // every page under app/admin
+</code></pre>
+<pre><code class="language-ts">appRouter({ getUser: async (ctx) =&gt; (await auth.getSession(ctx.request))?.user })
+</code></pre>
+<p>Usuários deslogados vão para <code>/login?callbackUrl=...</code> (ou para o seu <code>unauthorized.tsx</code>). Usuários sem o papel recebem <code>forbidden.tsx</code> com status 403.</p>
+<h2 id="componentes">Componentes</h2><p><code>&lt;Link&gt;</code> com prefetch, <code>&lt;Image&gt;</code> com <code>srcset</code>, lazy loading e redimensionamento via sharp quando ele está instalado, <code>&lt;Script&gt;</code> com estratégias de carregamento, <code>&lt;Head&gt;</code>, <code>&lt;JsonLd&gt;</code>, <code>&lt;SkipLink&gt;</code> e <code>&lt;Form&gt;</code>.</p>
+<pre><code class="language-tsx">import { Image, Link, JsonLd } from &#39;raiko.js/components&#39;
+
+&lt;Image src=&quot;/hero.png&quot; alt=&quot;Product screenshot&quot; width={1200} height={630} priority /&gt;
+</code></pre>
+<h2 id="client-tipado-e-hooks">Client tipado e hooks</h2><pre><code class="language-ts">const api = client&lt;App&gt;(&#39;&#39;, { retry: 2, timeout: 10_000, headers: () =&gt; ({ authorization: `Bearer ${token}` }) })
+</code></pre>
+<p>Hooks para React e Vue com queries, mutations e sockets:</p>
+<pre><code class="language-tsx">import { useQuery, useSocket } from &#39;raiko.js/react&#39;   // or &#39;raiko.js/vue&#39;
+
+const users = useQuery(() =&gt; api.get(&#39;/users&#39;), { key: &#39;users&#39; })
+const chat = useSocket(() =&gt; api.ws(&#39;/chat&#39;), (msg) =&gt; setMessages((m) =&gt; [...m, msg]))
+</code></pre>
+<h2 id="websockets">WebSockets</h2><pre><code class="language-ts">app.ws(&#39;/chat/:room&#39;, {
+  body: t.Object({ text: t.String({ maxLength: 500 }) }),
+  encrypt: true,
+  open: (ws) =&gt; ws.subscribe(ws.data.params.room),
+  message: (ws, msg) =&gt; ws.publish(ws.data.params.room, { from: ws.id, text: msg.text }),
+})
+</code></pre>
+<p>O client do navegador reconecta com backoff, enfileira mensagens enquanto está offline e cuida da troca de chaves. Com <code>encrypt: true</code>, as chaves são negociadas com ECDH P-256, cada direção recebe sua própria chave AES-GCM 256 derivada via HKDF, e os nonces são contadores de frames, então frames repetidos, fora de ordem ou refletidos são recusados. Tudo isso roda por cima do TLS (<code>wss://</code>); o objetivo é manter o conteúdo das mensagens longe de proxies e logs, não do próprio navegador do usuário.</p>
+<p>P2P com WebRTC:</p>
+<pre><code class="language-ts">import { signaling } from &#39;raiko.js/p2p&#39;
+app.use(signaling({ path: &#39;/p2p/:room&#39; }))
+
+// browser
+import { joinRoom } from &#39;raiko.js/p2p/client&#39;
+const room = joinRoom(api.ws(&#39;/p2p/lobby&#39;))
+room.on(&#39;message&#39;, (from, data) =&gt; console.log(from, data))
+room.send({ hi: true })
+</code></pre>
+<h2 id="autenticação-e-2fa">Autenticação e 2FA</h2><pre><code class="language-ts">import { raikoAuth, GitHub, Google, Credentials, verifyPassword } from &#39;raiko.js/auth&#39;
+
+export const auth = raikoAuth({
+  secret: process.env.AUTH_SECRET!,
+  providers: [
+    GitHub({ clientId, clientSecret }),
+    Credentials({ authorize: async ({ email, password }) =&gt; /* your lookup */ null }),
+  ],
+  twoFactor: { getSecret: (user) =&gt; user.totpSecret },
+})
+
+app.use(auth.plugin).get(&#39;/me&#39;, ({ auth }) =&gt; auth?.user, { beforeHandle: auth.protect })
+</code></pre>
+<p>O OAuth usa PKCE e um state assinado. As senhas usam PBKDF2 SHA-256 com 210.000 iterações. O TOTP funciona com Google Authenticator, Authy e 1Password, permite cinco tentativas por login e recusa códigos reutilizados. <code>generateTotpSecret()</code>, <code>totpUri()</code> e <code>recoveryCodes()</code> ajudam a montar a tela de configuração.</p>
+<h2 id="painel-admin">Painel admin</h2><pre><code class="language-ts">import { admin, modelAdapter } from &#39;raiko.js/admin&#39;
+
+app.use(admin({
+  auth: ({ auth }) =&gt; auth?.user.role ?? null,
+  resources: {
+    users: {
+      adapter: modelAdapter(db.users, { searchable: [&#39;email&#39;] }),
+      fields: [&#39;id&#39;, &#39;email&#39;, &#39;name&#39;, &#39;role&#39;],
+      hidden: [&#39;passwordHash&#39;],
+      permissions: { admin: &#39;*&#39;, support: [&#39;read&#39;, &#39;update&#39;], viewer: [&#39;list&#39;] },
+    },
+  },
+}))
+</code></pre>
+<p>Cada ação (<code>list</code>, <code>read</code>, <code>create</code>, <code>update</code>, <code>delete</code>) é verificada separadamente, então um papel de suporte pode corrigir um usuário sem conseguir listar ou excluir usuários. <code>modelAdapter</code> funciona com Kastor e Prisma, <code>drizzleAdapter</code> com Drizzle.</p>
+<h2 id="email">Email</h2><pre><code class="language-tsx">// emails/welcome.tsx
+/** @jsxImportSource raiko.js */
+export default function Welcome({ name }: { name: string }) {
+  return &lt;h1&gt;Welcome, {name}&lt;/h1&gt;
+}
+Welcome.subject = (p) =&gt; `Welcome, ${p.name}`
+Welcome.preview = { name: &#39;Ana&#39; }
+</code></pre>
+<pre><code class="language-ts">import { createMailer, resend } from &#39;raiko.js/mail&#39;
+
+const mailer = createMailer({ from: &#39;hi@my.app&#39;, transport: resend({ apiKey }), templates: { welcome: Welcome } })
+await mailer.send({ to: &#39;ana@x.io&#39;, template: &#39;welcome&#39;, props: { name: &#39;Ana&#39; } })
+app.use(mailer.preview())   // /_raiko/mail lists and renders every template
+</code></pre>
+<p>Uma versão em texto puro é gerada para cada email. Os templates também podem retornar HTML do React Email, do Vue ou qualquer string.</p>
+<h2 id="traduções">Traduções</h2><pre><code class="language-ts">import { createI18n } from &#39;raiko.js/i18n&#39;
+
+const i18n = createI18n({ en, &#39;pt-BR&#39;: ptBR }, { fallback: &#39;en&#39;, cookie: &#39;locale&#39; })
+i18n.t(&#39;pt-BR&#39;, &#39;cart.items&#39;, { count: 3 })   // &quot;3 itens&quot;, plurals with Intl.PluralRules
+</code></pre>
+<p>As chaves são tipadas a partir do seu dicionário de fallback. A detecção de idioma lê o prefixo da URL, um cookie e o <code>Accept-Language</code>.</p>
+<h2 id="plugins-embutidos">Plugins embutidos</h2><p>Em <code>raiko.js/plugins</code>: <code>cors</code>, <code>secureHeaders</code>, <code>rateLimit</code>, <code>csrf</code>, <code>logger</code>, <code>requestId</code>, <code>compress</code>, <code>etag</code>, <code>responseCache</code>, <code>health</code>, <code>staticFiles</code> e <code>openapi</code> (OpenAPI 3.1 com página de documentação em <code>/docs</code>).</p>
+<h2 id="erros-que-mostram-a-correção">Erros que mostram a correção</h2><pre><code>error[RK0104]: two routes use different param names at the same position
+  --&gt; app/blog/[slug]/page.tsx
+   |
+ 3 |   app/blog/[id]/page.tsx
+   |            ^^^^ already declared as [slug]
+   |
+   = help: rename the folder to [slug], or move one of the pages
+</code></pre>
+<p>Todo erro com código (<code>RK0100</code> em diante) tem uma página na <a href="https://kwy404.github.io/Raiko.js/docs/errors.html">referência de erros</a>.</p>
+<h2 id="qualquer-frontend">Qualquer frontend</h2><p>As Raiko Pages são renderizadas no servidor. Para uma single page app, o plugin do Vite roda o backend dentro do dev server do Vite, então React, Vue, Svelte, Solid, Preact ou Angular dividem a mesma porta com a API:</p>
+<pre><code class="language-ts">// vite.config.ts
+import react from &#39;@vitejs/plugin-react&#39;
+import { raiko } from &#39;raiko.js/vite&#39;
+
+export default { plugins: [react(), raiko({ entry: &#39;./server/index.ts&#39; })] }
+</code></pre>
+<p>Os builds de produção são minificados e ofuscados, sem source maps. Ofuscação dificulta a leitura, mas não a impede: segredos e regras ficam no servidor.</p>
+<h2 id="deploy">Deploy</h2><table>
+<thead>
+<tr>
+<th>Destino</th>
+<th>Como</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bun, Node, Deno</td>
+<td><code>app.listen(3000)</code>, ou <code>raiko build</code> e depois <code>raiko start</code></td>
+</tr>
+<tr>
+<td>Vários núcleos</td>
+<td><code>app.listen(3000, { cluster: true })</code>: um processo por núcleo na mesma porta</td>
+</tr>
+<tr>
+<td>Vercel</td>
+<td><code>export default { fetch: app.fetch }</code> em <code>api/index.ts</code> (o instalador cria esse arquivo)</td>
+</tr>
+<tr>
+<td>Cloudflare Workers</td>
+<td><code>export default { fetch: app.fetch }</code>, <code>wrangler deploy</code></td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>o instalador gera um <code>Dockerfile</code> multi stage que não roda como root</td>
+</tr>
+</tbody></table>
+<p><code>raiko deploy</code> escolhe o destino com base no seu projeto.</p>
+<h2 id="segurança">Segurança</h2><p>Padrões que aguentam ataques, cada um coberto por um teste:</p>
+<ul>
+<li>O HTML é escapado em todo lugar, e nomes de atributos e tags são validados.</li>
+<li>O parsing de query, cookies e formulários usa objetos com protótipo nulo (sem prototype pollution).</li>
+<li>Arquivos estáticos e o endpoint de imagens recusam path traversal.</li>
+<li>Cookies podem ser assinados, e as assinaturas têm uma única codificação canônica.</li>
+<li><code>cors({ credentials: true })</code> se recusa a rodar sem uma lista explícita de origens.</li>
+<li>Redirecionamentos depois do login e depois de form actions ficam no seu site.</li>
+<li>Os limites de body valem para uploads chunked e multipart.</li>
+<li>Erros de validação de resposta nunca enviam dados do servidor ao cliente.</li>
+<li>Os caches nunca servem a resposta de um usuário para outro.</li>
+<li>O rate limiter não confia em <code>X-Forwarded-For</code>, a menos que você diga para confiar.</li>
+</ul>
+<p>Duas auditorias independentes encontraram 21 problemas antes desta versão. Todos foram corrigidos, e cada um tem um teste que reproduz o ataque. Reporte vulnerabilidades pelo <a href="SECURITY.md">SECURITY.md</a>.</p>
+<h2 id="benchmarks">Benchmarks</h2><p>Requisições por segundo, quanto maior, melhor. As mesmas três rotas em todos os frameworks, no Bun, sobre HTTP real com autocannon (64 conexões, pipelining 4), mediana de três rodadas.</p>
+<!-- bench:start -->
+<p>Os resultados estão sendo medidos. Veja <a href="bench/">bench/</a> para rodar você mesmo.</p>
+<!-- bench:end -->
+
+<p>Observações honestas: a máquina tem uma única vCPU, então o gerador de carga e o servidor disputam o mesmo núcleo e os números ficam comprimidos. Nas rotas estáticas, Raiko e Elysia respondem direto do router nativo do Bun sem executar JavaScript, então empatam no teto. Rode <code>bun bench/http.ts</code> no seu próprio hardware.</p>
+<h2 id="comparação">Comparação</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>Raiko.js</th>
+<th>Elysia</th>
+<th>Next.js</th>
+<th>Hono</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Runtimes</td>
+<td>Bun, Node, Deno, Workers, Vercel</td>
+<td>Foco no Bun</td>
+<td>Node, Vercel</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>App router, layouts, loading, error</td>
+<td>Sim</td>
+<td>Não</td>
+<td>Sim</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Server components</td>
+<td>Sim, sem precisar de React</td>
+<td>Não</td>
+<td>Sim</td>
+<td>Só JSX</td>
+</tr>
+<tr>
+<td>Client tipado</td>
+<td>Sim</td>
+<td>Sim (Eden)</td>
+<td>Server actions</td>
+<td>Sim (RPC)</td>
+</tr>
+<tr>
+<td>WebSockets em todo runtime</td>
+<td>Sim</td>
+<td>Bun</td>
+<td>Não</td>
+<td>Depende do adapter</td>
+</tr>
+<tr>
+<td>Mensagens WebSocket criptografadas</td>
+<td>Sim</td>
+<td>Não</td>
+<td>Não</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Autenticação com OAuth e 2FA</td>
+<td>Embutida</td>
+<td>Plugins</td>
+<td>NextAuth</td>
+<td>Middleware</td>
+</tr>
+<tr>
+<td>Painel admin com permissões</td>
+<td>Embutido</td>
+<td>Não</td>
+<td>Não</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Templates de email com preview</td>
+<td>Embutidos</td>
+<td>Não</td>
+<td>Não</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>Tamanho do ecossistema</td>
+<td>Novo</td>
+<td>Crescendo</td>
+<td>Enorme</td>
+<td>Grande</td>
+</tr>
+</tbody></table>
+<h2 id="problemas-do-nextjs-que-ele-resolve">Problemas do Next.js que ele resolve</h2><ul>
+<li><strong>Um processo só para páginas e API.</strong> Sem backend separado, sem tipos duplicados.</li>
+<li><strong>Sem React obrigatório no servidor.</strong> Páginas são funções assíncronas simples que retornam TSX.</li>
+<li><strong>WebSockets de verdade.</strong> O Next.js não tem servidor WebSocket, e o Raiko tem um em todo runtime.</li>
+<li><strong>Cache previsível.</strong> Só páginas que exportam <code>revalidate</code> vão para o cache, nunca requisições personalizadas.</li>
+<li><strong>Roda em qualquer lugar.</strong> O mesmo app faz deploy em Bun, Node, Deno, Workers e Vercel sem um projeto de adapter.</li>
+<li><strong>Erros que dão para resolver.</strong> Erros com código e a correção, não um stack trace minificado.</li>
+<li><strong>Autenticação, admin e email inclusos.</strong> O que todo produto precisa não vira um monte de bibliotecas separadas para integrar.</li>
+</ul>
+<h2 id="testes">Testes</h2><pre><code class="language-ts">const res = await app.request(&#39;/users&#39;, { json: { email: &#39;a@b.co&#39;, name: &#39;Ana&#39; } })
+expect(res.status).toBe(201)
+</code></pre>
+<p>Sem servidor, sem porta: <code>app.request()</code> e <code>app.fetch()</code> executam o ciclo de vida completo em memória.</p>
+<h2 id="mais-projetos-de-kwy404">Mais projetos de kwy404</h2><table>
+<thead>
+<tr>
+<th>Projeto</th>
+<th>O que faz</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://github.com/kwy404/Voodoo.js">Voodoo.js</a></td>
+<td>JSX em HTML puro sem etapa de build, usado para interatividade nas Raiko Pages</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/monsoon">Monsoon</a></td>
+<td>CSS utility first sem etapa de build, com um tema a partir de uma única cor</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/glyphfox">glyphfox</a></td>
+<td>Ícones com morphing para todos os frameworks</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/kastor">Kastor</a></td>
+<td>O ORM TypeScript para quase todos os bancos de dados</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/a11ymedic">a11ymedic</a></td>
+<td>Verificador de acessibilidade que explica a correção</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/cookieowl">cookieowl</a></td>
+<td>Consentimento de cookies para LGPD e GDPR que bloqueia rastreadores de verdade</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/installkite">installkite</a></td>
+<td>Torna qualquer site instalável e capaz de funcionar offline</td>
+</tr>
+<tr>
+<td><a href="https://github.com/kwy404/edgegoat">edgegoat</a></td>
+<td>Entradas de teste de casos extremos para JavaScript</td>
+</tr>
+</tbody></table>
+<h2 id="autor">Autor</h2><p>Criado por <strong>Alexandre Kohler</strong> (<a href="https://github.com/kwy404">GitHub</a>).</p>
+<h2 id="licença">Licença</h2><p><a href="LICENSE">MIT</a></p>
+</main></div></body></html>

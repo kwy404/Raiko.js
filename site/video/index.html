@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raiko.js video and LinkedIn post</title>
+<meta name="description" content="Launch video of Raiko.js and the LinkedIn post, ready to copy.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../logo.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800&family=Geist+Mono&display=swap">
+<link rel="stylesheet" href="../style.css">
+<style>
+.vwrap{display:grid;grid-template-columns:minmax(0,420px) 1fr;gap:40px;padding:56px 24px;max-width:1160px;margin:0 auto;align-items:start}
+video{width:100%;aspect-ratio:9/16;border-radius:16px;border:1px solid var(--line2);background:#000}
+.post{border:1px solid var(--line2);border-radius:14px;background:var(--bg2);padding:20px;margin-bottom:20px}
+.post textarea{width:100%;min-height:380px;background:transparent;color:var(--fg);border:0;font:15px/1.6 Geist,system-ui,sans-serif;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.row h2{font-size:18px;margin:0;flex:1}
+.copybtn{background:var(--y);color:#0a0a0b;border:0;border-radius:8px;height:36px;padding:0 14px;font-weight:600;cursor:pointer}
+.dl{color:var(--y)}
+@media (max-width:900px){.vwrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="../"><img src="../logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a><div class="sp"></div><a class="ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="../docs/">Docs</a></div></header>
+<main class="vwrap">
+  <div>
+    <video src="raiko.mp4" poster="poster.jpg" controls playsinline preload="metadata"></video>
+    <p><a class="dl" href="raiko.mp4" download>Baixar o vídeo (MP4, 1080x1920)</a></p>
+  </div>
+  <div>
+    <div class="post">
+      <div class="row"><h2>Post do LinkedIn (português)</h2><button class="copybtn" data-copy="pt">Copiar</button></div>
+      <textarea id="pt" aria-label="Post em português" readonly></textarea>
+    </div>
+    <div class="post">
+      <div class="row"><h2>LinkedIn post (English)</h2><button class="copybtn" data-copy="en">Copy</button></div>
+      <textarea id="en" aria-label="Post in English" readonly></textarea>
+    </div>
+  </div>
+</main>
+<script src="post.js"></script>
+<script>
+document.getElementById('pt').value = window.POST.pt
+document.getElementById('en').value = window.POST.en
+for (const b of document.querySelectorAll('[data-copy]')) b.addEventListener('click', async () => {
+  await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).value)
+  const t = b.textContent
+  b.textContent = b.dataset.copy === 'pt' ? 'Copiado' : 'Copied'
+  setTimeout(() => (b.textContent = t), 1500)
+})
+</script>
+</body>
+</html>

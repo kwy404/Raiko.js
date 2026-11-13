@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Bun tests, typecheck, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.38
+      - run: bun install
+      - run: bun run typecheck
+      - run: NODE_ENV=test bun test
+      - run: bun run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  node:
+    name: Node ${{ matrix.node }}
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - run: node test/node/smoke.mjs
+
+  deno:
+    name: Deno
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - run: deno run --allow-net --allow-read --allow-env test/deno/smoke.ts
+
+  fuzz:
+    name: Long fuzz run
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: FUZZ_RUNS=100000 NODE_ENV=test bun test --timeout 0 test/fuzz.test.ts
+
+  templates:
+    name: Template ${{ matrix.template }}
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [pages-full, pages-min, pages-tailwind-drizzle, pages-uno-prisma, react, react-stylex, vue, svelte, solid, preact, angular]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: bun install && bun run build && npm pack --pack-destination /tmp
+      - run: RAIKO_TGZ=$(ls /tmp/raiko.js-*.tgz) E2E_DIR=/tmp/e2e node test/e2e/templates.mjs ${{ matrix.template }}

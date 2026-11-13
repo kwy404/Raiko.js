@@ -1,0 +1,104 @@
+// End to end: generate a project per combination, install, typecheck, build, boot and hit it.
+// node test/e2e/templates.mjs [filter]
+import { spawnSync, spawn } from 'node:child_process'
+import { mkdirSync, rmSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { join } from 'node:path'
+
+const TGZ = process.env.RAIKO_TGZ
+const BUN = process.env.BUN ?? 'bun'
+const root = process.env.E2E_DIR ?? '/tmp/raiko-e2e'
+const filter = process.argv[2]
+const combos = [
+  { id: 'pages-full', cookies: 'lgpd', frontend: 'raiko', css: 'monsoon', orm: 'kastor', db: 'sqlite', auth: 'credentials', twofa: true, email: 'resend', i18n: true, admin: true, roles: 'editor,support', icons: 'glyphfox', motion: true, deploy: 'vercel' },
+  { id: 'pages-min', template: 'minimal', frontend: 'raiko', css: 'none', orm: 'none', auth: 'none', email: 'none', icons: 'none', deploy: 'docker' },
+  { id: 'pages-tailwind-drizzle', frontend: 'raiko', css: 'tailwind', orm: 'drizzle', db: 'sqlite', auth: 'credentials,github', twofa: false, email: 'smtp', admin: true, roles: 'viewer', icons: 'lucide', deploy: 'cloudflare' },
+  { id: 'pages-uno-prisma', frontend: 'raiko', css: 'unocss', orm: 'prisma', db: 'sqlite', auth: 'google', twofa: true, email: 'postmark', admin: true, roles: 'editor', icons: 'glyphfox', deploy: 'node' },
+  { id: 'react', cookies: 'gdpr', frontend: 'react', css: 'tailwind', orm: 'kastor', db: 'sqlite', auth: 'credentials', twofa: true, email: 'resend', i18n: true, admin: true, roles: 'editor', icons: 'lucide', motion: true, deploy: 'vercel' },
+  { id: 'react-stylex', frontend: 'react', css: 'stylex', orm: 'none', auth: 'none', email: 'none', icons: 'heroicons', deploy: 'docker' },
+  { id: 'vue', frontend: 'vue', css: 'monsoon', orm: 'drizzle', db: 'sqlite', auth: 'github', email: 'sendgrid', admin: true, roles: 'viewer', icons: 'glyphfox', deploy: 'cloudflare' },
+  { id: 'svelte', frontend: 'svelte', css: 'unocss', orm: 'none', auth: 'none', email: 'none', icons: 'lucide', deploy: 'docker' },
+  { id: 'solid', frontend: 'solid', css: 'none', orm: 'none', auth: 'credentials', email: 'none', icons: 'glyphfox', deploy: 'vercel' },
+  { id: 'preact', frontend: 'preact', css: 'tailwind', orm: 'none', auth: 'none', email: 'none', icons: 'lucide', deploy: 'node' },
+  { id: 'angular', frontend: 'angular', css: 'monsoon', orm: 'none', auth: 'none', email: 'none', icons: 'none', deploy: 'docker' },
+].filter((c) => !filter || c.id.includes(filter))
+
+const sh = (cmd, args, cwd, env = {}) => {
+  const r = spawnSync(cmd, args, { cwd, encoding: 'utf8', env: { ...process.env, ...env }, timeout: 600_000 })
+  return { ok: r.status === 0, out: (r.stdout ?? '') + (r.stderr ?? '') }
+}
+
+async function boot(cwd, entry, env) {
+  const port = 4000 + Math.floor(Math.random() * 2000)
+  const p = spawn(BUN, [entry], { cwd, env: { ...process.env, PORT: String(port), ...env }, stdio: 'pipe' })
+  let log = ''
+  p.stdout.on('data', (d) => (log += d))
+  p.stderr.on('data', (d) => (log += d))
+  for (let i = 0; i < 100; i++) {
+    await new Promise((r) => setTimeout(r, 150))
+    try {
+      await fetch(`http://127.0.0.1:${port}/health`)
+      return { url: `http://127.0.0.1:${port}`, stop: () => p.kill(), log: () => log }
+    } catch {}
+  }
+  p.kill()
+  throw new Error('server did not start\n' + log)
+}
+
+mkdirSync(root, { recursive: true })
+const results = []
+for (const c of combos) {
+  const dir = join(root, c.id)
+  rmSync(dir, { recursive: true, force: true })
+  const steps = []
+  const step = (name, r) => {
+    steps.push(`${r.ok ? 'ok  ' : 'FAIL'} ${name}`)
+    if (!r.ok) throw new Error(`${name}\n${r.out.slice(-3000)}`)
+  }
+  try {
+    const flags = Object.entries({ template: 'full', twofa: false, i18n: false, admin: false, motion: false, db: 'sqlite', ...c }).filter(([k]) => k !== 'id').flatMap(([k, v]) => [`--${k}`, String(v)])
+    step('generate', sh('node', [join(process.cwd(), 'packages/create-raiko/index.mjs'), c.id, '--yes', '--pm', 'bun', '--install', 'false', '--git', 'false', ...flags], root))
+    const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
+    pkg.dependencies['raiko.js'] = `file:${TGZ}`
+    writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg, null, 2))
+    step('install', sh(BUN, ['install'], dir))
+    const vite = c.frontend !== 'raiko'
+    if (!vite) step('manifest', sh(BUN, ['x', 'raiko', 'manifest'], dir))
+    if (c.orm === 'prisma') step('prisma generate', sh(BUN, ['x', 'prisma', 'generate'], dir))
+    step('typecheck', sh(BUN, ['x', 'tsc', '--noEmit'], dir))
+    if (vite) step('vite build', sh(BUN, ['x', 'vite', 'build'], dir, { NODE_ENV: 'production' }))
+    const s = await boot(dir, vite ? 'server/index.ts' : 'server.ts', { NODE_ENV: vite ? 'production' : 'development', AUTH_SECRET: 'x'.repeat(48), DATABASE_URL: c.orm === 'prisma' ? 'file:./e2e.db' : 'e2e.db' })
+    try {
+      const get = async (p, init) => fetch(s.url + p, { redirect: 'manual', ...init })
+      const home = await get('/')
+      const body = await home.text()
+      step(`GET / ${home.status}`, { ok: home.status === 200 && body.includes(vite ? '<div id="app">' : '</html>') || (c.frontend === 'angular' && body.includes('app-root')), out: body.slice(0, 500) + s.log() })
+      const hello = await get(vite ? '/api/hello?name=e2e' : '/api/hello?name=e2e')
+      step(`GET /api/hello ${hello.status}`, { ok: hello.status === 200 && (await hello.json()).hello === 'e2e', out: s.log() })
+      const docs = await get('/docs/json')
+      step(`GET /docs/json ${docs.status}`, { ok: docs.status === 200, out: s.log() })
+      const nf = await get('/definitely-missing', { headers: { accept: 'text/html' } })
+      step(`404 ${nf.status}`, { ok: vite ? nf.status === 200 : nf.status === 404, out: s.log() })
+      if (c.admin) {
+        const a = await get('/admin')
+        step(`GET /admin ${a.status}`, { ok: [200, 302].includes(a.status), out: s.log() })
+      }
+      if (c.auth && c.auth !== 'none') {
+        const ses = await get('/auth/session')
+        step(`GET /auth/session ${ses.status}`, { ok: ses.status === 200 || ses.status === 204, out: s.log() })
+      }
+      if (!vite && c.email && c.email !== 'none') {
+        const m = await get('/_raiko/mail/welcome')
+        step(`email preview ${m.status}`, { ok: m.status === 200, out: s.log() })
+      }
+    } finally {
+      s.stop()
+    }
+    results.push({ id: c.id, ok: true, steps })
+  } catch (e) {
+    results.push({ id: c.id, ok: false, steps, error: String(e.message ?? e) })
+  }
+  const r = results.at(-1)
+  console.log(`\n${r.ok ? 'PASS' : 'FAIL'} ${c.id}\n  ${r.steps.join('\n  ')}${r.error ? '\n' + r.error.slice(0, 2500) : ''}`)
+}
+console.log(`\n${results.filter((r) => r.ok).length}/${results.length} templates passed`)
+process.exit(results.every((r) => r.ok) ? 0 : 1)
