@@ -58,9 +58,12 @@ for (const c of combos) {
   try {
     const flags = Object.entries({ template: 'full', twofa: false, i18n: false, admin: false, motion: false, db: 'sqlite', ...c }).filter(([k]) => k !== 'id').flatMap(([k, v]) => [`--${k}`, String(v)])
     step('generate', sh('node', [join(process.cwd(), 'packages/create-raiko/index.mjs'), c.id, '--yes', '--pm', 'bun', '--install', 'false', '--git', 'false', ...flags], root))
-    const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
-    pkg.dependencies['raiko.js'] = `file:${TGZ}`
-    writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg, null, 2))
+    // without RAIKO_TGZ the project installs raiko.js from the npm registry, like a real user
+    if (TGZ) {
+      const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
+      pkg.dependencies['raiko.js'] = `file:${TGZ}`
+      writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg, null, 2))
+    }
     step('install', sh(BUN, ['install'], dir))
     const vite = c.frontend !== 'raiko'
     if (!vite) step('manifest', sh(BUN, ['x', 'raiko', 'manifest'], dir))
