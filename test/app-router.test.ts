@@ -147,3 +147,23 @@ describe('layout without head', () => {
     expect(html).toContain('<title>T</title>')
   })
 })
+
+describe('public folder with a manifest', () => {
+  it('still serves files from ./public', async () => {
+    const { mkdirSync, writeFileSync, rmSync } = await import('node:fs')
+    const dir = '/tmp/claude-0/pubtest'
+    mkdirSync(dir + '/public', { recursive: true })
+    writeFileSync(dir + '/public/hello.css', 'body{}')
+    const cwd = process.cwd()
+    process.chdir(dir)
+    try {
+      const a = new Raiko().use(await appRouter({ dev: false, manifest: { 'page.tsx': { default: () => jsx('p', { children: 'x' }) } } }))
+      const r = await a.request('/hello.css')
+      expect(r.status).toBe(200)
+      expect(await r.text()).toBe('body{}')
+    } finally {
+      process.chdir(cwd)
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+})

@@ -1,4 +1,5 @@
 // Generates every file of a new project from the installer answers.
+import { welcomeFiles } from './welcome.mjs'
 import { V, LOCALES, isVite, run, exec, dbFiles, configFile, sharedFiles, serverPieces, authFiles, emailFiles, i18nFiles, adminFiles, deployFiles, envExample, gitignore } from './templates-common.mjs'
 
 const json = (v) => JSON.stringify(v, null, 2) + '\n'
@@ -622,6 +623,16 @@ export function generate(input) {
     ...i18nFiles(o),
     ...adminFiles(o),
     ...deployFiles(o),
+  }
+  // the starter page that teaches the first steps, the same design in every framework
+  Object.assign(files, welcomeFiles(o))
+  for (const main of ['web/src/main.tsx', 'web/src/main.ts']) {
+    if (files[main]) files[main] = files[main].replace(/^(import [^\n]*\n)(?!import)/m, "$1import './welcome.css'\n")
+  }
+  if (!isVite(o)) {
+    files['app/layout.tsx'] = files['app/layout.tsx'].replace('<meta name="viewport" content="width=device-width, initial-scale=1" />', '<meta name="viewport" content="width=device-width, initial-scale=1" />\n        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;600&display=swap" />\n        <link rel="stylesheet" href="/welcome.css" />')
+  } else {
+    files['web/index.html'] = files['web/index.html'].replace('<link rel="icon" href="/favicon.svg" />', '<link rel="icon" href="/favicon.svg" />\n    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;600&display=swap" />')
   }
   if (!isVite(o)) {
     files['public/favicon.svg'] = FAVICON

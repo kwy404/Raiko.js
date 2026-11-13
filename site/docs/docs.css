@@ -9,3 +9,7 @@
 .md table{width:100%;border-collapse:collapse;font-size:14.5px;margin:16px 0;display:block;overflow-x:auto}.md th,.md td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
 .md th{background:var(--bg2)}.ghost.lang.on{border-color:var(--y);color:var(--y)}
 @media (max-width:900px){.docs{grid-template-columns:1fr}.docs aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.md{padding:24px 16px 80px}}
+/* the header fits a phone: language buttons stay, the GitHub button moves out */
+.docs-gh { display: inline-flex }
+@media (max-width: 640px) { .docs-gh { display: none } .nav .wrap { gap: 8px } .ghost.lang { padding: 0 8px } }
+html, body { overflow-x: clip }

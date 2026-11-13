@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.3
+
+- Fixed: with a routes manifest (the default in generated apps), files in `public/` were not served, so stylesheets, the favicon and page scripts returned 404. `public/` is now served whenever it exists.
+- New starter page in every template (Raiko Pages, React, Vue, Svelte, Solid, Preact, Angular): the file to edit, deploy and docs buttons, links to the API, docs, admin and email previews you picked, and a live check that the backend answers.
+- Installer: Esc, Backspace or the left arrow goes back to the previous question with your answers kept; choices no longer redraw in the wrong place on narrow terminals; a key legend under each question.
+- Docs: a getting started section with the address to open (3000 for Raiko Pages, 5173 for Vite frontends), how to change the port, open it on a phone, and what to do when the port is busy.
+
 ## 1.0.2
 
 - `raiko dev` and `raiko start` start the server themselves and print where to open it (Local and Network URLs), so a project whose entry never called `listen()` no longer sits silent. A busy port fails with error RK0706 and the port to try.

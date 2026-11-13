@@ -23,6 +23,7 @@
   <div class="nav-in">
     <a class="brand" href="./" aria-label="Raiko.js home"><span class="mark" data-i="bolt"></span><span>Raiko<small>.js</small></span></a>
     <nav class="links" aria-label="Main">
+      <a href="#start">{ T[lang].qs.eyebrow }</a>
       <a href="docs/">{ T[lang].nav[0] }</a>
       <a href="#features">{ T[lang].nav[1] }</a>
       <a href="#performance">{ T[lang].nav[2] }</a>
@@ -38,6 +39,7 @@
   </div>
 </header>
 <nav id="drawer" class="drawer" :hidden="!menu" hidden aria-label="Mobile">
+  <a href="#start" v-on:click="menu = false">{ T[lang].qs.eyebrow }</a>
   <a href="docs/" v-on:click="menu = false">{ T[lang].nav[0] }</a>
   <a href="#features" v-on:click="menu = false">{ T[lang].nav[1] }</a>
   <a href="#performance" v-on:click="menu = false">{ T[lang].nav[2] }</a>
@@ -66,6 +68,42 @@
     <p>{ T[lang].runs }</p>
     <span class="rt tooltip" data-tip="app.listen() with the native router"><i>B</i>Bun</span><span class="rt tooltip" data-tip="Node 20 and newer"><i>N</i>Node.js</span><span class="rt tooltip" data-tip="Deno.serve, WebSockets included"><i>D</i>Deno</span><span class="rt tooltip" data-tip="export default { fetch }"><i>W</i>Workers</span><span class="rt tooltip" data-tip="one function in api/index.ts"><i>V</i>Vercel</span><span class="rt tooltip" data-tip="non root, multi stage image"><i>D</i>Docker</span>
   </div>
+</section>
+
+<section class="row" id="start" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].qs.eyebrow }</p>
+    <h2>{ T[lang].qs.title }</h2>
+    <p class="lede">{ T[lang].qs.sub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="qs">
+    <ol class="qs-steps">
+      <li><b>{ T[lang].qs.steps[0][0] }</b><span>{ T[lang].qs.steps[0][1] }</span><code v-pre>npx create-raiko@latest my-app</code></li>
+      <li><b>{ T[lang].qs.steps[1][0] }</b><span>{ T[lang].qs.steps[1][1] }</span><code v-pre>cd my-app && npm run dev</code></li>
+      <li><b>{ T[lang].qs.steps[2][0] }</b><span>{ T[lang].qs.steps[2][1] }</span><code v-pre>http://localhost:3000</code></li>
+    </ol>
+    <div class="qs-ill" aria-hidden="true">
+<div class="qs-term" v-pre><span class="d">$</span> npm run dev
+
+  <span class="a">raiko.js</span> 1.0.3 <span class="d">dev</span>
+
+  - Local:    <span class="u">http://localhost:3000</span>
+  - Network:  <span class="u">http://192.168.0.10:3000</span>
+
+  <span class="ok">ready</span> in 240 ms</div>
+      <div class="qs-browser">
+        <div class="bar"><i></i><i></i><i></i><span>localhost:3000</span></div>
+        <div class="qs-page" v-pre>
+          <div class="qs-logo"><span class="m" data-i="bolt"></span>raiko<em>.js</em></div>
+          <div class="qs-lines"><span>1. Get started by editing <code>app/page.tsx</code></span><span>2. Save and see your changes instantly.</span></div>
+          <div class="qs-btns"><span class="s">Deploy now</span><span>Read the docs</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ports"><div v-for="p in T[lang].qs.ports"><span v-text="p[0]"></span><code v-text="p[1]"></code></div></div>
 </section>
 
 <section class="row" id="features" style="padding-bottom:0">
@@ -118,6 +156,26 @@
       <div class="ill err codeill" v-pre><span class="r">error[RK0104]</span>: param names differ<br>&nbsp; --&gt; app/blog/[slug]/page.tsx<br>&nbsp;&nbsp; |&nbsp; app/blog/<span class="r">[id]</span>/page.tsx<br>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="r">^^^^</span><br>&nbsp;&nbsp; = <span class="h">help</span>: rename it to [slug]</div>
     </article>
   </div>
+</section>
+
+<section class="row" id="how" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].flow.eyebrow }</p>
+    <h2>{ T[lang].flow.title }</h2>
+    <p class="lede">{ T[lang].flow.sub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="flow">
+    <div class="fnode end"><span data-i="globe"></span><b>Browser</b><small>GET /users/7</small></div>
+    <div class="fstage"><span data-i="branch"></span><b>{ T[lang].flow.steps[0][0] }</b><small>{ T[lang].flow.steps[0][1] }</small></div>
+    <div class="fstage"><span data-i="shield"></span><b>{ T[lang].flow.steps[1][0] }</b><small>{ T[lang].flow.steps[1][1] }</small></div>
+    <div class="fstage"><span data-i="check"></span><b>{ T[lang].flow.steps[2][0] }</b><small>{ T[lang].flow.steps[2][1] }</small></div>
+    <div class="fstage hl"><span data-i="code"></span><b>{ T[lang].flow.steps[3][0] }</b><small>{ T[lang].flow.steps[3][1] }</small></div>
+    <div class="fstage"><span data-i="arrow"></span><b>{ T[lang].flow.steps[4][0] }</b><small>{ T[lang].flow.steps[4][1] }</small></div>
+    <div class="fnode end"><span data-i="server"></span><b>200 OK</b><small v-pre>{ id: 7, name: "Ana" }</small></div>
+  </div>
+  <p class="flow-ws" v-pre><span class="lock" data-i="lock"></span><span>WebSocket <code>/chat</code>: same router, same hooks and schema, then AES-GCM frames both ways until the socket closes.</span></p>
 </section>
 
 <section class="row" style="padding-bottom:0">
@@ -179,6 +237,19 @@ export default {
       <div class="browser" v-show="tab === 1" hidden><div class="bar"><i></i><i></i><i></i><span>POST /api/users</span></div><div class="json" v-pre>201 Created<br>{<br>&nbsp; <span class="key">"id"</span>: 7,<br>&nbsp; <span class="key">"email"</span>: "ana@raiko.dev"<br>}<br><br>422 Unprocessable Content<br>body.email: Expected a valid email</div></div>
       <div class="browser" v-show="tab === 2" hidden><div class="bar"><i></i><i></i><i></i><span>wss://localhost:3000/chat</span></div><div class="chatprev" v-pre><span>hi, everyone</span><span class="me">hey Ana</span><span>is this encrypted?</span><span class="me">AES-GCM, per direction</span></div></div>
     </div>
+  </div>
+</section>
+
+<section class="row" id="project" style="padding-bottom:0">
+  <div class="head">
+    <p class="eyebrow">{ T[lang].tree.eyebrow }</p>
+    <h2>{ T[lang].tree.title }</h2>
+    <p class="lede">{ T[lang].tree.sub }</p>
+  </div>
+</section>
+<section class="row flush" style="border-top:0">
+  <div class="ptree">
+    <div class="ptree-row" v-for="it in T[lang].tree.items"><code><span class="fi" :class="{ dir: it[0].endsWith('/') }"></span><span v-text="it[0]"></span></code><span class="desc" v-text="it[1]"></span></div>
   </div>
 </section>
 

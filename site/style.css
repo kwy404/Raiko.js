@@ -254,3 +254,63 @@ footer { border-top: 1px solid var(--line) }
 /* touch screens have no hover: tooltips stay off, and nothing may push the page sideways */
 @media (hover: none) { .tooltip::before, .tooltip::after { display: none } }
 html, body { overflow-x: clip }
+
+/* quick start */
+.qs { display: grid; grid-template-columns: .9fr 1.1fr; border-top: 1px solid var(--line) }
+.qs > * { min-width: 0 }
+.qs-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; border-right: 1px solid var(--line) }
+.qs-steps li { counter-increment: s; padding: 28px var(--pad) 28px 76px; border-bottom: 1px solid var(--line); position: relative; display: grid; gap: 6px }
+.qs-steps li:last-child { border-bottom: 0 }
+.qs-steps li::before { content: counter(s); position: absolute; left: var(--pad); top: 26px; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; font: 600 13px var(--mono); color: var(--fg) }
+.qs-steps b { font-size: 16px } .qs-steps span { color: var(--fg-2); font-size: 14.5px }
+.qs-steps code { justify-self: start; max-width: 100%; overflow-x: auto; white-space: nowrap; background: var(--bg-1); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; font-size: 13.5px; margin-top: 4px }
+.qs-ill { padding: 28px var(--pad); display: grid; gap: 16px; background: var(--bg-1); align-content: center }
+.qs-term { background: var(--code-bg); color: #e4e4e7; border: 1px solid #1f1f1f; border-radius: 12px; padding: 18px 20px; font: 13px/1.7 var(--mono); white-space: pre; overflow-x: auto }
+.qs-term .d { color: #707070 } .qs-term .a { color: #ffd23f } .qs-term .u { color: #22d3ee } .qs-term .ok { color: #3ecf8e }
+.qs-browser { border: 1px solid var(--line-2); border-radius: 12px; overflow: hidden; background: var(--bg) }
+.qs-browser .bar { display: flex; gap: 6px; align-items: center; padding: 9px 12px; border-bottom: 1px solid var(--line); font: 12px var(--mono); color: var(--fg-3) }
+.qs-browser .bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-2) }
+.qs-browser .bar span { margin-left: 6px; background: var(--bg-2); border-radius: 6px; padding: 2px 10px; flex: 1; min-width: 0 }
+.qs-page { padding: 20px 22px; display: grid; gap: 14px }
+.qs-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px } .qs-logo em { color: var(--fg-3); font-style: normal; font-weight: 500 }
+.qs-logo .m { width: 22px; height: 22px; border-radius: 6px; background: var(--fg); color: var(--bg); display: grid; place-items: center } .qs-logo .m svg { width: 13px; height: 13px; fill: currentColor; stroke: none }
+.qs-lines { display: grid; gap: 4px; font: 12.5px var(--mono); color: var(--fg-2) } .qs-lines code { color: var(--fg); background: var(--bg-2); padding: 1px 5px; border-radius: 4px }
+.qs-btns { display: flex; gap: 8px; flex-wrap: wrap } .qs-btns span { border: 1px solid var(--line-2); border-radius: 999px; padding: 6px 14px; font-size: 12.5px } .qs-btns .s { background: var(--fg); color: var(--bg); border-color: var(--fg) }
+.ports { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line) }
+.ports div { padding: 18px var(--pad); border-right: 1px solid var(--line); display: grid; gap: 4px } .ports div:last-child { border-right: 0 }
+.ports span { color: var(--fg-3); font-size: 13px } .ports code { font-size: 14px; color: var(--fg) }
+
+/* request flow */
+.flow { display: flex; align-items: stretch; gap: 0; border-top: 1px solid var(--line); overflow-x: auto }
+.flow > div { flex: 1 1 0; min-width: 130px; padding: 24px 16px; border-right: 1px solid var(--line); display: grid; gap: 6px; align-content: start; position: relative }
+.flow > div:last-child { border-right: 0 }
+.flow > div:not(:last-child)::after { content: ""; position: absolute; right: -6px; top: 36px; width: 10px; height: 10px; border-top: 1px solid var(--fg-3); border-right: 1px solid var(--fg-3); transform: rotate(45deg); background: var(--bg); z-index: 1 }
+.flow span[data-i] { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--fg-2) }
+.flow span[data-i] svg { width: 17px; height: 17px }
+.flow b { font-size: 14.5px } .flow small { color: var(--fg-2); font-size: 13px; line-height: 1.45 }
+.flow .end { background: var(--bg-1) } .flow .end small { font-family: var(--mono); font-size: 12px }
+.flow .hl span[data-i] { border-color: var(--accent); color: var(--accent) }
+.flow-ws { margin: 0; border-top: 1px solid var(--line); padding: 16px var(--pad); color: var(--fg-2); font-size: 14px; display: flex; gap: 10px; align-items: flex-start }
+.flow-ws .lock { flex: none; margin-top: 2px }
+.flow-ws .lock svg { width: 16px; height: 16px; color: var(--accent) }
+
+/* project tree */
+.ptree { border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr }
+.ptree-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 16px var(--pad); border-bottom: 1px solid var(--line); border-right: 1px solid var(--line) }
+.ptree-row:nth-child(2n) { border-right: 0 }
+.ptree-row code { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--fg); overflow-x: auto; white-space: nowrap }
+.ptree-row .desc { color: var(--fg-2); font-size: 14px }
+.fi { width: 14px; height: 14px; flex: none; border: 1px solid var(--fg-3); border-radius: 3px } .fi.dir { border-radius: 2px 6px 3px 3px; background: color-mix(in srgb, var(--accent) 22%, transparent); border-color: var(--accent) }
+
+@media (max-width: 980px) {
+  .qs { grid-template-columns: 1fr } .qs-steps { border-right: 0; border-bottom: 1px solid var(--line) }
+  .ports { grid-template-columns: 1fr 1fr } .ports div:nth-child(2n) { border-right: 0 } .ports div { border-bottom: 1px solid var(--line) }
+  .flow { flex-direction: column; overflow: visible } .flow > div { border-right: 0; border-bottom: 1px solid var(--line); grid-template-columns: 34px 1fr; column-gap: 14px; align-items: center }
+  .flow > div small { grid-column: 2 } .flow > div span[data-i] { grid-row: span 2 }
+  .flow > div:not(:last-child)::after { right: auto; left: 28px; top: auto; bottom: -6px; transform: rotate(135deg) }
+  .ptree { grid-template-columns: 1fr } .ptree-row { border-right: 0 }
+}
+@media (max-width: 640px) {
+  .qs-steps li { padding: 24px 16px 24px 60px } .qs-steps li::before { left: 16px }
+  .qs-ill { padding: 20px 16px } .ports div, .ptree-row, .flow-ws { padding-left: 16px; padding-right: 16px } .flow > div { padding: 18px 16px }
+}

@@ -99,8 +99,14 @@ export async function appRouter(options: AppRouterOptions = {}): Promise<Raiko> 
     break
   }
 
-  const publicDir = options.publicDir === undefined && manifest ? null : resolve(options.publicDir ?? 'public')
-  if (publicDir && existsSync(publicDir)) {
+  // ./public is served whenever it exists, with or without a manifest; hosts without a file system
+  // (Workers) simply have no folder there, and their own static assets take over
+  const publicDir = resolve(options.publicDir ?? 'public')
+  let hasPublic = false
+  try {
+    hasPublic = existsSync(publicDir)
+  } catch {}
+  if (hasPublic) {
     const { staticFiles } = await import('../plugins/static')
     app.use(staticFiles({ dir: publicDir, prefix: '/' }))
     const { imageHandler } = await import('./image')

@@ -5,15 +5,50 @@
 <link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="docs.css"></head>
 <body><a class="skip" href="#doc">Skip to content</a>
 <header class="nav"><div class="wrap"><a class="brand" href="../"><img src="../logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a>
-<div class="sp"></div><a class="ghost lang on" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none">EN</a><a class="ghost lang" href="pt.html" style="display:inline-flex;align-items:center;text-decoration:none">PT</a><a class="ghost lang" href="es.html" style="display:inline-flex;align-items:center;text-decoration:none">ES</a><a class="ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
-<div class="docs"><aside><nav aria-label="Sections"><a href="#start-in-one-command">Start in one command</a><a href="#the-30-second-tour">The 30 second tour</a><a href="#contents">Contents</a><a href="#why-raiko">Why Raiko</a><a href="#routing-and-handlers">Routing and handlers</a><a href="#validation">Validation</a><a href="#lifecycle-hooks">Lifecycle hooks</a><a href="#state-decorators-and-plugins">State, decorators and plugins</a><a href="#responses-and-streaming">Responses and streaming</a><a href="#app-router">App router</a><a href="#protected-pages">Protected pages</a><a href="#components">Components</a><a href="#typed-client-and-hooks">Typed client and hooks</a><a href="#websockets">WebSockets</a><a href="#auth-and-2fa">Auth and 2FA</a><a href="#admin-panel">Admin panel</a><a href="#email">Email</a><a href="#translations">Translations</a><a href="#built-in-plugins">Built in plugins</a><a href="#errors-that-tell-you-the-fix">Errors that tell you the fix</a><a href="#any-frontend">Any frontend</a><a href="#deploy">Deploy</a><a href="#security">Security</a><a href="#benchmarks">Benchmarks</a><a href="#how-it-compares">How it compares</a><a href="#nextjs-pain-points-it-solves">Next.js pain points it solves</a><a href="#testing">Testing</a><a href="#more-projects-by-kwy404">More projects by kwy404</a><a href="#author">Author</a><a href="#license">License</a><a href="errors.html">Error codes</a></nav></aside><main id="doc" class="md"><h1>Documentation</h1><h2 id="start-in-one-command">Start in one command</h2><pre><code class="language-bash">npx create-raiko@latest my-app
+<div class="sp"></div><a class="ghost lang on" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none">EN</a><a class="ghost lang" href="pt.html" style="display:inline-flex;align-items:center;text-decoration:none">PT</a><a class="ghost lang" href="es.html" style="display:inline-flex;align-items:center;text-decoration:none">ES</a><a class="ghost docs-gh" style="align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
+<div class="docs"><aside><nav aria-label="Sections"><a href="#start-in-one-command">Start in one command</a><a href="#the-30-second-tour">The 30 second tour</a><a href="#contents">Contents</a><a href="#why-raiko">Why Raiko</a><a href="#routing-and-handlers">Routing and handlers</a><a href="#validation">Validation</a><a href="#lifecycle-hooks">Lifecycle hooks</a><a href="#state-decorators-and-plugins">State, decorators and plugins</a><a href="#responses-and-streaming">Responses and streaming</a><a href="#app-router">App router</a><a href="#protected-pages">Protected pages</a><a href="#components">Components</a><a href="#typed-client-and-hooks">Typed client and hooks</a><a href="#websockets">WebSockets</a><a href="#auth-and-2fa">Auth and 2FA</a><a href="#admin-panel">Admin panel</a><a href="#email">Email</a><a href="#translations">Translations</a><a href="#built-in-plugins">Built in plugins</a><a href="#errors-that-tell-you-the-fix">Errors that tell you the fix</a><a href="#any-frontend">Any frontend</a><a href="#deploy">Deploy</a><a href="#security">Security</a><a href="#benchmarks">Benchmarks</a><a href="#how-it-compares">How it compares</a><a href="#nextjs-pain-points-it-solves">Next.js pain points it solves</a><a href="#testing">Testing</a><a href="#more-projects-by-kwy404">More projects by kwy404</a><a href="#author">Author</a><a href="#license">License</a><a href="errors.html">Error codes</a></nav></aside><main id="doc" class="md"><h1>Documentation</h1><h2 id="start-in-one-command">Start in one command</h2><p><strong>1. Create the project.</strong> The installer asks what you want (frontend, CSS, database, sign in, email, deploy) and writes an app that already works.</p>
+<pre><code class="language-bash">npx create-raiko@latest my-app
 # or
 bun create raiko my-app
 </code></pre>
-<p>The installer asks what you want and writes a project that already works: frontend (Raiko Pages with Voodoo.js, React, Vue, Svelte, Solid, Preact or Angular), CSS (Monsoon, Tailwind, StyleX, UnoCSS), icons, database (Kastor, Prisma or Drizzle on SQLite or PostgreSQL), sign in (email and password, GitHub, Google, Discord, GitLab), two factor auth, email provider, translations, admin roles, a cookie banner, an installable app, and a deploy target. Every combination is installed, type checked, built and booted in CI.</p>
+<p>Use the arrow keys to move, Enter to choose, Space to mark items in a list, and Esc to go back to the previous question.</p>
+<p><strong>2. Start the dev server.</strong></p>
 <pre><code class="language-bash">cd my-app
-npm run dev
+npm run dev        # or: bun run dev
 </code></pre>
+<p><strong>3. Open the address the terminal prints.</strong></p>
+<pre><code>  raiko.js 1.0.3 dev
+
+  - Local:    http://localhost:3000
+  - Network:  http://192.168.0.10:3000
+
+  ready in 240 ms  (save a file to reload)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>You picked</th>
+<th>Open</th>
+<th>What runs there</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Raiko Pages (the default)</td>
+<td><a href="http://localhost:3000">http://localhost:3000</a></td>
+<td>pages, API, sockets, admin, one server</td>
+</tr>
+<tr>
+<td>React, Vue, Svelte, Solid, Preact or Angular</td>
+<td><a href="http://localhost:5173">http://localhost:5173</a></td>
+<td>Vite, with the Raiko backend inside it on the same port</td>
+</tr>
+</tbody></table>
+<p>You will see the starter page with the next steps. Edit the file it names (<code>app/page.tsx</code>, or <code>web/src/App.tsx</code> for Vite templates), save, and the page reloads.</p>
+<p>Useful addresses in a new app: <code>/api/hello</code> (an API route), <code>/docs</code> (API docs generated from your schemas), <code>/health</code>, and, when you picked them, <code>/admin</code>, <code>/login</code> and <code>/_raiko/mail</code> (email previews).</p>
+<p><strong>Open it on your phone.</strong> Use the Network address while the phone is on the same Wi-Fi.</p>
+<p><strong>Use another port.</strong> <code>PORT=4000 npm run dev</code> (Raiko Pages) or <code>npm run dev -- --port 4000</code> (Vite templates).</p>
+<p><strong>Port already in use.</strong> You will see <code>error[RK0706]: port 3000 is already in use</code>. Stop the other server or pick another port as above.</p>
+<p><strong>Production.</strong> <code>npm run build</code> then <code>npm run start</code> serves the same app with <code>NODE_ENV=production</code>, on the port in <code>PORT</code> (3000 by default).</p>
 <h2 id="the-30-second-tour">The 30 second tour</h2><p>An API with validation, types and OpenAPI docs from one schema:</p>
 <pre><code class="language-ts">import { Raiko, t } from &#39;raiko.js&#39;
 
@@ -354,10 +389,54 @@ export default { plugins: [react(), raiko({ entry: &#39;./server/index.ts&#39; }
 <li>Caches never serve one user&#39;s response to another.</li>
 <li>The rate limiter does not trust <code>X-Forwarded-For</code> unless you say so.</li>
 </ul>
-<p>Two independent audits found 21 issues before this release. All are fixed, and each has a test that reproduces the attack. Report a vulnerability through <a href="SECURITY.md">SECURITY.md</a>.</p>
+<p>Two independent audits found 21 issues before this release. All are fixed, and each has a test that reproduces the attack. Report a vulnerability through <a href="https://github.com/kwy404/Raiko.js/blob/main/SECURITY.md">SECURITY.md</a>.</p>
 <h2 id="benchmarks">Benchmarks</h2><p>Requests per second, higher is better. The same three routes in every framework, on Bun, over real HTTP with autocannon (64 connections, pipelining 4), median of three rounds.</p>
 <!-- bench:start -->
-<p>Results are being measured. See <a href="bench/">bench/</a> to run them yourself.</p>
+<table>
+<thead>
+<tr>
+<th>Server rendered page</th>
+<th align="right">Raiko.js (Bun)</th>
+<th align="right">Raiko.js (Node)</th>
+<th align="right">Next.js 15 (Node)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>req/s</td>
+<td align="right">8,910</td>
+<td align="right">3,737</td>
+<td align="right">155</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th align="right">Raiko.js</th>
+<th align="right">Elysia 1.4</th>
+<th align="right">Hono 4.13</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>text</td>
+<td align="right">99,040</td>
+<td align="right">83,192</td>
+<td align="right">63,920</td>
+</tr>
+<tr>
+<td>params + json</td>
+<td align="right">66,943</td>
+<td align="right">75,723</td>
+<td align="right">60,477</td>
+</tr>
+<tr>
+<td>json body</td>
+<td align="right">51,136</td>
+<td align="right">53,168</td>
+<td align="right">47,029</td>
+</tr>
+</tbody></table>
+<p>AMD EPYC 9J45, 1 vCPU, 1.9 GB RAM, Linux 6.8, Bun 1.4.4, Node 22.23. autocannon -c 64 -p 4, median of 3 rounds.</p>
 <!-- bench:end -->
 
 <p>Honest notes: the machine has one vCPU, so the load generator and the server share it and the numbers are compressed. On static routes, Raiko and Elysia both answer from Bun&#39;s native router without running JavaScript, so they tie at the ceiling. Run <code>bun bench/http.ts</code> on your own hardware.</p>
@@ -496,5 +575,5 @@ expect(res.status).toBe(201)
 </tr>
 </tbody></table>
 <h2 id="author">Author</h2><p>Created by <strong>Alexandre Kohler</strong> (<a href="https://github.com/kwy404">GitHub</a>).</p>
-<h2 id="license">License</h2><p><a href="LICENSE">MIT</a></p>
+<h2 id="license">License</h2><p><a href="https://github.com/kwy404/Raiko.js/blob/main/LICENSE">MIT</a></p>
 </main></div></body></html>

@@ -78,6 +78,11 @@ for (const c of combos) {
       step(`GET / ${home.status}`, { ok: home.status === 200 && body.includes(vite ? '<div id="app">' : '</html>') || (c.frontend === 'angular' && body.includes('app-root')), out: body.slice(0, 500) + s.log() })
       const hello = await get(vite ? '/api/hello?name=e2e' : '/api/hello?name=e2e')
       step(`GET /api/hello ${hello.status}`, { ok: hello.status === 200 && (await hello.json()).hello === 'e2e', out: s.log() })
+      // files in public/ must be served (stylesheets, favicon, scripts)
+      for (const f of vite ? ['/favicon.svg'] : ['/favicon.svg', '/welcome.css']) {
+        const r = await get(f)
+        step(`GET ${f} ${r.status}`, { ok: r.status === 200, out: s.log() })
+      }
       const docs = await get('/docs/json')
       step(`GET /docs/json ${docs.status}`, { ok: docs.status === 200, out: s.log() })
       const nf = await get('/definitely-missing', { headers: { accept: 'text/html' } })

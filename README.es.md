@@ -21,20 +21,52 @@
 
 </div>
 
-## Empieza con un solo comando
+## Empieza con un comando
+
+**1. Crea el proyecto.** El instalador pregunta lo que quieres (frontend, CSS, base de datos, login, email, deploy) y escribe una app que ya funciona.
 
 ```bash
 npx create-raiko@latest my-app
-# or
+# o
 bun create raiko my-app
 ```
 
-El instalador te pregunta qué necesitas y genera un proyecto que ya funciona: frontend (Raiko Pages con Voodoo.js, React, Vue, Svelte, Solid, Preact o Angular), CSS (Monsoon, Tailwind, StyleX, UnoCSS), íconos, base de datos (Kastor, Prisma o Drizzle sobre SQLite o PostgreSQL), inicio de sesión (correo y contraseña, GitHub, Google, Discord, GitLab), autenticación de dos factores, proveedor de correo, traducciones, roles de administración, un banner de cookies, una app instalable y un destino de despliegue. Cada combinación se instala, se verifica con el chequeo de tipos, se compila y se arranca en CI.
+Usa las flechas para moverte, Enter para elegir, Espacio para marcar elementos de una lista y Esc para volver a la pregunta anterior.
+
+**2. Arranca el servidor de desarrollo.**
 
 ```bash
 cd my-app
-npm run dev
+npm run dev        # o: bun run dev
 ```
+
+**3. Abre la dirección que muestra la terminal.**
+
+```
+  raiko.js 1.0.3 dev
+
+  - Local:    http://localhost:3000
+  - Network:  http://192.168.0.10:3000
+
+  ready in 240 ms  (save a file to reload)
+```
+
+| Elegiste | Abre | Qué corre ahí |
+| --- | --- | --- |
+| Raiko Pages (por defecto) | http://localhost:3000 | páginas, API, sockets y admin en un solo servidor |
+| React, Vue, Svelte, Solid, Preact o Angular | http://localhost:5173 | Vite, con el backend de Raiko dentro en el mismo puerto |
+
+Verás la página inicial con los siguientes pasos. Edita el archivo que indica (`app/page.tsx`, o `web/src/App.tsx` en las plantillas con Vite), guarda y la página se recarga.
+
+Direcciones útiles en una app nueva: `/api/hello` (una ruta de API), `/docs` (documentación de la API generada desde tus esquemas), `/health` y, si los elegiste, `/admin`, `/login` y `/_raiko/mail` (vista previa de emails).
+
+**Abrir en el celular.** Usa la dirección Network con el celular en el mismo Wi-Fi.
+
+**Usar otro puerto.** `PORT=4000 npm run dev` (Raiko Pages) o `npm run dev -- --port 4000` (plantillas con Vite).
+
+**Puerto ocupado.** Verás `error[RK0706]: port 3000 is already in use`. Detén el otro servidor o usa otro puerto como arriba.
+
+**Producción.** `npm run build` y luego `npm run start` sirven la misma app con `NODE_ENV=production`, en el puerto de `PORT` (3000 por defecto).
 
 ## El recorrido de 30 segundos
 

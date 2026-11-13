@@ -23,18 +23,50 @@
 
 ## Start in one command
 
+**1. Create the project.** The installer asks what you want (frontend, CSS, database, sign in, email, deploy) and writes an app that already works.
+
 ```bash
 npx create-raiko@latest my-app
 # or
 bun create raiko my-app
 ```
 
-The installer asks what you want and writes a project that already works: frontend (Raiko Pages with Voodoo.js, React, Vue, Svelte, Solid, Preact or Angular), CSS (Monsoon, Tailwind, StyleX, UnoCSS), icons, database (Kastor, Prisma or Drizzle on SQLite or PostgreSQL), sign in (email and password, GitHub, Google, Discord, GitLab), two factor auth, email provider, translations, admin roles, a cookie banner, an installable app, and a deploy target. Every combination is installed, type checked, built and booted in CI.
+Use the arrow keys to move, Enter to choose, Space to mark items in a list, and Esc to go back to the previous question.
+
+**2. Start the dev server.**
 
 ```bash
 cd my-app
-npm run dev
+npm run dev        # or: bun run dev
 ```
+
+**3. Open the address the terminal prints.**
+
+```
+  raiko.js 1.0.3 dev
+
+  - Local:    http://localhost:3000
+  - Network:  http://192.168.0.10:3000
+
+  ready in 240 ms  (save a file to reload)
+```
+
+| You picked | Open | What runs there |
+| --- | --- | --- |
+| Raiko Pages (the default) | http://localhost:3000 | pages, API, sockets, admin, one server |
+| React, Vue, Svelte, Solid, Preact or Angular | http://localhost:5173 | Vite, with the Raiko backend inside it on the same port |
+
+You will see the starter page with the next steps. Edit the file it names (`app/page.tsx`, or `web/src/App.tsx` for Vite templates), save, and the page reloads.
+
+Useful addresses in a new app: `/api/hello` (an API route), `/docs` (API docs generated from your schemas), `/health`, and, when you picked them, `/admin`, `/login` and `/_raiko/mail` (email previews).
+
+**Open it on your phone.** Use the Network address while the phone is on the same Wi-Fi.
+
+**Use another port.** `PORT=4000 npm run dev` (Raiko Pages) or `npm run dev -- --port 4000` (Vite templates).
+
+**Port already in use.** You will see `error[RK0706]: port 3000 is already in use`. Stop the other server or pick another port as above.
+
+**Production.** `npm run build` then `npm run start` serves the same app with `NODE_ENV=production`, on the port in `PORT` (3000 by default).
 
 ## The 30 second tour
 

@@ -49,7 +49,7 @@ const page = (lang: string, title: string, nav: string, body: string, langs: str
 <link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="docs.css"></head>
 <body><a class="skip" href="#doc">Skip to content</a>
 <header class="nav"><div class="wrap"><a class="brand" href="../"><img src="../logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a>
-<div class="sp"></div>${langs}<a class="ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
+<div class="sp"></div>${langs}<a class="ghost docs-gh" style="align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
 <div class="docs"><aside><nav aria-label="Sections">${nav}<a href="errors.html">Error codes</a></nav></aside><main id="doc" class="md">${body}</main></div></body></html>`
 
 const langLinks = (current: string) => LANGS.map((l) => `<a class="ghost lang${l.page === current ? ' on' : ''}" href="${l.page}" style="display:inline-flex;align-items:center;text-decoration:none">${l.lang.slice(0, 2).toUpperCase()}</a>`).join('')
@@ -69,6 +69,16 @@ for (const l of LANGS) {
     const id = slug(text)
     if (depth === 2) heads.push(`<a href="#${id}">${text}</a>`)
     return `<h${depth} id="${id}">${text}</h${depth}>`
+  }
+  // links that point at files in the repository (LICENSE, SECURITY.md, bench/) go to GitHub;
+  // links to the other README languages go to the matching docs page
+  renderer.link = ({ href, title, tokens }) => {
+    const text = marked.Parser.parseInline(tokens)
+    let url = href ?? ''
+    const sibling = LANGS.find((x) => x.file === url)
+    if (sibling) url = sibling.page
+    else if (url && !/^(https?:|mailto:|#)/.test(url)) url = `https://github.com/kwy404/Raiko.js/blob/main/${url.replace(/^\.\//, '')}`
+    return `<a href="${url}"${title ? ` title="${title}"` : ''}>${text}</a>`
   }
   const body = `<h1>${l.title}</h1>` + (marked.parse(md, { renderer, async: false }) as string)
   writeFileSync(new URL(l.page, out), page(l.lang, l.title, heads.join(''), body, langLinks(l.page)))

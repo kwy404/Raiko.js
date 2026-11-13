@@ -5,15 +5,50 @@
 <link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="docs.css"></head>
 <body><a class="skip" href="#doc">Skip to content</a>
 <header class="nav"><div class="wrap"><a class="brand" href="../"><img src="../logo.svg" width="28" height="28" alt=""><span class="wm">raiko<span>.js</span></span></a>
-<div class="sp"></div><a class="ghost lang" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none">EN</a><a class="ghost lang on" href="pt.html" style="display:inline-flex;align-items:center;text-decoration:none">PT</a><a class="ghost lang" href="es.html" style="display:inline-flex;align-items:center;text-decoration:none">ES</a><a class="ghost" style="display:inline-flex;align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
-<div class="docs"><aside><nav aria-label="Sections"><a href="#comece-com-um-comando">Comece com um comando</a><a href="#o-tour-de-30-segundos">O tour de 30 segundos</a><a href="#conteúdo">Conteúdo</a><a href="#por-que-raiko">Por que Raiko</a><a href="#rotas-e-handlers">Rotas e handlers</a><a href="#validação">Validação</a><a href="#hooks-de-ciclo-de-vida">Hooks de ciclo de vida</a><a href="#estado-decorators-e-plugins">Estado, decorators e plugins</a><a href="#respostas-e-streaming">Respostas e streaming</a><a href="#app-router">App router</a><a href="#páginas-protegidas">Páginas protegidas</a><a href="#componentes">Componentes</a><a href="#client-tipado-e-hooks">Client tipado e hooks</a><a href="#websockets">WebSockets</a><a href="#autenticação-e-2fa">Autenticação e 2FA</a><a href="#painel-admin">Painel admin</a><a href="#email">Email</a><a href="#traduções">Traduções</a><a href="#plugins-embutidos">Plugins embutidos</a><a href="#erros-que-mostram-a-correção">Erros que mostram a correção</a><a href="#qualquer-frontend">Qualquer frontend</a><a href="#deploy">Deploy</a><a href="#segurança">Segurança</a><a href="#benchmarks">Benchmarks</a><a href="#comparação">Comparação</a><a href="#problemas-do-nextjs-que-ele-resolve">Problemas do Next.js que ele resolve</a><a href="#testes">Testes</a><a href="#mais-projetos-de-kwy404">Mais projetos de kwy404</a><a href="#autor">Autor</a><a href="#licença">Licença</a><a href="errors.html">Error codes</a></nav></aside><main id="doc" class="md"><h1>Documentação</h1><h2 id="comece-com-um-comando">Comece com um comando</h2><pre><code class="language-bash">npx create-raiko@latest my-app
-# or
+<div class="sp"></div><a class="ghost lang" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none">EN</a><a class="ghost lang on" href="pt.html" style="display:inline-flex;align-items:center;text-decoration:none">PT</a><a class="ghost lang" href="es.html" style="display:inline-flex;align-items:center;text-decoration:none">ES</a><a class="ghost docs-gh" style="align-items:center;text-decoration:none" href="https://github.com/kwy404/Raiko.js">GitHub</a></div></header>
+<div class="docs"><aside><nav aria-label="Sections"><a href="#comece-com-um-comando">Comece com um comando</a><a href="#o-tour-de-30-segundos">O tour de 30 segundos</a><a href="#conteúdo">Conteúdo</a><a href="#por-que-raiko">Por que Raiko</a><a href="#rotas-e-handlers">Rotas e handlers</a><a href="#validação">Validação</a><a href="#hooks-de-ciclo-de-vida">Hooks de ciclo de vida</a><a href="#estado-decorators-e-plugins">Estado, decorators e plugins</a><a href="#respostas-e-streaming">Respostas e streaming</a><a href="#app-router">App router</a><a href="#páginas-protegidas">Páginas protegidas</a><a href="#componentes">Componentes</a><a href="#client-tipado-e-hooks">Client tipado e hooks</a><a href="#websockets">WebSockets</a><a href="#autenticação-e-2fa">Autenticação e 2FA</a><a href="#painel-admin">Painel admin</a><a href="#email">Email</a><a href="#traduções">Traduções</a><a href="#plugins-embutidos">Plugins embutidos</a><a href="#erros-que-mostram-a-correção">Erros que mostram a correção</a><a href="#qualquer-frontend">Qualquer frontend</a><a href="#deploy">Deploy</a><a href="#segurança">Segurança</a><a href="#benchmarks">Benchmarks</a><a href="#comparação">Comparação</a><a href="#problemas-do-nextjs-que-ele-resolve">Problemas do Next.js que ele resolve</a><a href="#testes">Testes</a><a href="#mais-projetos-de-kwy404">Mais projetos de kwy404</a><a href="#autor">Autor</a><a href="#licença">Licença</a><a href="errors.html">Error codes</a></nav></aside><main id="doc" class="md"><h1>Documentação</h1><h2 id="comece-com-um-comando">Comece com um comando</h2><p><strong>1. Crie o projeto.</strong> O instalador pergunta o que você quer (frontend, CSS, banco, login, e-mail, deploy) e escreve um app que já funciona.</p>
+<pre><code class="language-bash">npx create-raiko@latest my-app
+# ou
 bun create raiko my-app
 </code></pre>
-<p>O instalador pergunta o que você quer e gera um projeto que já funciona: frontend (Raiko Pages com Voodoo.js, React, Vue, Svelte, Solid, Preact ou Angular), CSS (Monsoon, Tailwind, StyleX, UnoCSS), ícones, banco de dados (Kastor, Prisma ou Drizzle sobre SQLite ou PostgreSQL), login (email e senha, GitHub, Google, Discord, GitLab), autenticação em dois fatores, provedor de email, traduções, papéis de admin, banner de cookies, app instalável e destino de deploy. Toda combinação é instalada, checada nos tipos, compilada e executada no CI.</p>
+<p>Use as setas para mover, Enter para escolher, Espaço para marcar itens numa lista e Esc para voltar à pergunta anterior.</p>
+<p><strong>2. Suba o servidor de desenvolvimento.</strong></p>
 <pre><code class="language-bash">cd my-app
-npm run dev
+npm run dev        # ou: bun run dev
 </code></pre>
+<p><strong>3. Abra o endereço que o terminal mostra.</strong></p>
+<pre><code>  raiko.js 1.0.3 dev
+
+  - Local:    http://localhost:3000
+  - Network:  http://192.168.0.10:3000
+
+  ready in 240 ms  (save a file to reload)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Você escolheu</th>
+<th>Abra</th>
+<th>O que roda ali</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Raiko Pages (o padrão)</td>
+<td><a href="http://localhost:3000">http://localhost:3000</a></td>
+<td>páginas, API, sockets e admin num servidor só</td>
+</tr>
+<tr>
+<td>React, Vue, Svelte, Solid, Preact ou Angular</td>
+<td><a href="http://localhost:5173">http://localhost:5173</a></td>
+<td>o Vite, com o backend do Raiko dentro dele na mesma porta</td>
+</tr>
+</tbody></table>
+<p>Você verá a página inicial com os próximos passos. Edite o arquivo que ela indica (<code>app/page.tsx</code>, ou <code>web/src/App.tsx</code> nos templates com Vite), salve e a página recarrega.</p>
+<p>Endereços úteis num app novo: <code>/api/hello</code> (uma rota de API), <code>/docs</code> (documentação da API gerada pelos seus schemas), <code>/health</code> e, se você escolheu, <code>/admin</code>, <code>/login</code> e <code>/_raiko/mail</code> (prévia dos e-mails).</p>
+<p><strong>Abrir no celular.</strong> Use o endereço Network com o celular no mesmo Wi-Fi.</p>
+<p><strong>Usar outra porta.</strong> <code>PORT=4000 npm run dev</code> (Raiko Pages) ou <code>npm run dev -- --port 4000</code> (templates com Vite).</p>
+<p><strong>Porta ocupada.</strong> Aparece <code>error[RK0706]: port 3000 is already in use</code>. Pare o outro servidor ou use outra porta como acima.</p>
+<p><strong>Produção.</strong> <code>npm run build</code> e depois <code>npm run start</code> sobem o mesmo app com <code>NODE_ENV=production</code>, na porta de <code>PORT</code> (3000 por padrão).</p>
 <h2 id="o-tour-de-30-segundos">O tour de 30 segundos</h2><p>Uma API com validação, tipos e documentação OpenAPI a partir de um único schema:</p>
 <pre><code class="language-ts">import { Raiko, t } from &#39;raiko.js&#39;
 
@@ -54,26 +89,26 @@ const { data, error } = await api.post(&#39;/users&#39;, { body: { email: &#39;a
 <h2 id="conteúdo">Conteúdo</h2><ul>
 <li><a href="#por-que-raiko">Por que Raiko</a></li>
 <li><a href="#rotas-e-handlers">Rotas e handlers</a></li>
-<li><a href="#valida%C3%A7%C3%A3o">Validação</a></li>
+<li><a href="#validação">Validação</a></li>
 <li><a href="#hooks-de-ciclo-de-vida">Hooks de ciclo de vida</a></li>
 <li><a href="#estado-decorators-e-plugins">Estado, decorators e plugins</a></li>
 <li><a href="#respostas-e-streaming">Respostas e streaming</a></li>
 <li><a href="#app-router">App router</a></li>
-<li><a href="#p%C3%A1ginas-protegidas">Páginas protegidas</a></li>
+<li><a href="#páginas-protegidas">Páginas protegidas</a></li>
 <li><a href="#componentes">Componentes</a></li>
 <li><a href="#client-tipado-e-hooks">Client tipado e hooks</a></li>
 <li><a href="#websockets">WebSockets</a></li>
-<li><a href="#autentica%C3%A7%C3%A3o-e-2fa">Autenticação e 2FA</a></li>
+<li><a href="#autenticação-e-2fa">Autenticação e 2FA</a></li>
 <li><a href="#painel-admin">Painel admin</a></li>
 <li><a href="#email">Email</a></li>
-<li><a href="#tradu%C3%A7%C3%B5es">Traduções</a></li>
+<li><a href="#traduções">Traduções</a></li>
 <li><a href="#plugins-embutidos">Plugins embutidos</a></li>
-<li><a href="#erros-que-mostram-a-corre%C3%A7%C3%A3o">Erros que mostram a correção</a></li>
+<li><a href="#erros-que-mostram-a-correção">Erros que mostram a correção</a></li>
 <li><a href="#qualquer-frontend">Qualquer frontend</a></li>
 <li><a href="#deploy">Deploy</a></li>
-<li><a href="#seguran%C3%A7a">Segurança</a></li>
+<li><a href="#segurança">Segurança</a></li>
 <li><a href="#benchmarks">Benchmarks</a></li>
-<li><a href="#compara%C3%A7%C3%A3o">Comparação</a></li>
+<li><a href="#comparação">Comparação</a></li>
 <li><a href="#problemas-do-nextjs-que-ele-resolve">Problemas do Next.js que ele resolve</a></li>
 <li><a href="#testes">Testes</a></li>
 </ul>
@@ -354,10 +389,54 @@ export default { plugins: [react(), raiko({ entry: &#39;./server/index.ts&#39; }
 <li>Os caches nunca servem a resposta de um usuário para outro.</li>
 <li>O rate limiter não confia em <code>X-Forwarded-For</code>, a menos que você diga para confiar.</li>
 </ul>
-<p>Duas auditorias independentes encontraram 21 problemas antes desta versão. Todos foram corrigidos, e cada um tem um teste que reproduz o ataque. Reporte vulnerabilidades pelo <a href="SECURITY.md">SECURITY.md</a>.</p>
+<p>Duas auditorias independentes encontraram 21 problemas antes desta versão. Todos foram corrigidos, e cada um tem um teste que reproduz o ataque. Reporte vulnerabilidades pelo <a href="https://github.com/kwy404/Raiko.js/blob/main/SECURITY.md">SECURITY.md</a>.</p>
 <h2 id="benchmarks">Benchmarks</h2><p>Requisições por segundo, quanto maior, melhor. As mesmas três rotas em todos os frameworks, no Bun, sobre HTTP real com autocannon (64 conexões, pipelining 4), mediana de três rodadas.</p>
 <!-- bench:start -->
-<p>Os resultados estão sendo medidos. Veja <a href="bench/">bench/</a> para rodar você mesmo.</p>
+<table>
+<thead>
+<tr>
+<th>Server rendered page</th>
+<th align="right">Raiko.js (Bun)</th>
+<th align="right">Raiko.js (Node)</th>
+<th align="right">Next.js 15 (Node)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>req/s</td>
+<td align="right">8,910</td>
+<td align="right">3,737</td>
+<td align="right">155</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th align="right">Raiko.js</th>
+<th align="right">Elysia 1.4</th>
+<th align="right">Hono 4.13</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>text</td>
+<td align="right">99,040</td>
+<td align="right">83,192</td>
+<td align="right">63,920</td>
+</tr>
+<tr>
+<td>params + json</td>
+<td align="right">66,943</td>
+<td align="right">75,723</td>
+<td align="right">60,477</td>
+</tr>
+<tr>
+<td>json body</td>
+<td align="right">51,136</td>
+<td align="right">53,168</td>
+<td align="right">47,029</td>
+</tr>
+</tbody></table>
+<p>AMD EPYC 9J45, 1 vCPU, 1.9 GB RAM, Linux 6.8, Bun 1.4.4, Node 22.23. autocannon -c 64 -p 4, median of 3 rounds.</p>
 <!-- bench:end -->
 
 <p>Observações honestas: a máquina tem uma única vCPU, então o gerador de carga e o servidor disputam o mesmo núcleo e os números ficam comprimidos. Nas rotas estáticas, Raiko e Elysia respondem direto do router nativo do Bun sem executar JavaScript, então empatam no teto. Rode <code>bun bench/http.ts</code> no seu próprio hardware.</p>
@@ -496,5 +575,5 @@ expect(res.status).toBe(201)
 </tr>
 </tbody></table>
 <h2 id="autor">Autor</h2><p>Criado por <strong>Alexandre Kohler</strong> (<a href="https://github.com/kwy404">GitHub</a>).</p>
-<h2 id="licença">Licença</h2><p><a href="LICENSE">MIT</a></p>
+<h2 id="licença">Licença</h2><p><a href="https://github.com/kwy404/Raiko.js/blob/main/LICENSE">MIT</a></p>
 </main></div></body></html>
