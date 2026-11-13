@@ -1,6 +1,6 @@
 {
   "name": "raiko.js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "The full stack TypeScript framework: Next.js style app router, server components, typed API, WebSockets with encryption, auth, admin and email. Runs on Bun, Node, Deno, Cloudflare Workers and Vercel.",
   "type": "module",
   "license": "MIT",
@@ -128,6 +128,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "dev": "bun --watch examples/hello/server.ts",
     "build": "tsup && tsc -p tsconfig.build.json",
     "test": "bun test",
     "test:node": "node test/node/smoke.mjs",

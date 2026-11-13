@@ -1,6 +1,6 @@
 {
   "name": "create-raiko",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create a Raiko.js app: pick your frontend, CSS, database, auth, email, i18n and deploy target.",
   "type": "module",
   "bin": {

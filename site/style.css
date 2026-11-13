@@ -52,7 +52,7 @@ select.btn { padding: 0 8px; appearance: auto }
 /* frame and ruled rows */
 .frame { max-width: var(--frame); margin: 0 auto; border-left: 1px solid var(--line); border-right: 1px solid var(--line) }
 .row { position: relative; border-top: 1px solid var(--line); padding: 96px var(--pad) }
-.row::before, .row::after { content: "+"; position: absolute; top: -12px; font: 300 22px/22px var(--mono); color: var(--fg-3); background: var(--bg); width: 22px; text-align: center; z-index: 2 }
+.row::before, .row::after { content: none; position: absolute; top: -12px; font: 300 22px/22px var(--mono); color: var(--fg-3); background: var(--bg); width: 22px; text-align: center; z-index: 2 }
 .row::before { left: -12px } .row::after { right: -12px }
 .row.flush { padding: 0 }
 .eyebrow { font: 500 13px var(--mono); color: var(--fg-3); text-transform: uppercase; letter-spacing: .08em; margin: 0 0 14px }
@@ -231,3 +231,26 @@ footer { border-top: 1px solid var(--line) }
 
 .codeill { white-space: nowrap; overflow-x: auto }
 .codeill .zero { position: sticky; float: right; margin-top: 10px }
+
+/* "+" marks only where the frame has room around it, so they never cause sideways scroll */
+@media (min-width: 1260px) { .row::before, .row::after { content: "+" } }
+/* language menu (Monsoon dropdown) */
+.dropdown { position: relative }
+.dropdown > summary { list-style: none; min-width: 52px } .dropdown > summary::-webkit-details-marker { display: none }
+.rk-menu { position: absolute; right: 0; top: calc(100% + 6px); min-width: 170px; background: var(--bg); border: 1px solid var(--line-2); border-radius: 10px; padding: 6px; display: grid; gap: 2px; box-shadow: 0 16px 40px rgba(0,0,0,.35); z-index: 70 }
+.dropdown-top .rk-menu { top: auto; bottom: calc(100% + 6px); left: 0; right: auto }
+.rk-menu button { all: unset; cursor: pointer; padding: 10px 12px; border-radius: 6px; font-size: 14px; color: var(--fg-2) }
+.rk-menu button:hover, .rk-menu button:focus-visible { background: var(--bg-2); color: var(--fg) } .rk-menu button.on { color: var(--fg); font-weight: 600 }
+.tooltip { display: inline-flex }
+.drawer-tools { display: flex; gap: 8px; padding-top: 16px }
+.rt.tooltip { cursor: help }
+/* comfortable tap targets on touch sized screens */
+@media (max-width: 980px) {
+  .btn, .icon-btn { min-height: 44px } .icon-btn { width: 44px }
+  .tabs button { padding: 12px 14px } .cmd button { padding: 12px }
+  .rk-menu button { padding: 13px 14px }
+}
+
+/* touch screens have no hover: tooltips stay off, and nothing may push the page sideways */
+@media (hover: none) { .tooltip::before, .tooltip::after { display: none } }
+html, body { overflow-x: clip }

@@ -102,6 +102,7 @@ export async function serve(
     await stop()
     await app.stop()
   }
+  ;(globalThis as { __raikoListening?: string }).__raikoListening = result.url
   opts.onListen?.(result.url)
   return result
 }

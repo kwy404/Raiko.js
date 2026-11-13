@@ -2,7 +2,8 @@
 // raiko: dev, build, start, deploy, secret, routes, manifest
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync, watch, readFileSync } from 'node:fs'
-import { join, relative, resolve } from 'node:path'
+import { join, relative, resolve, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { randomBytes } from 'node:crypto'
 
 const [cmd = 'help', ...args] = process.argv.slice(2)
@@ -48,6 +49,12 @@ function manifest() {
   return files.length
 }
 
+/** Run a package binary: bunx when Bun is here (works without Node), npx otherwise. */
+function x(pkgBin, a, env) {
+  return hasBun() ? run('bun', ['x', '--bun', pkgBin, ...a], env) : run('npx', [pkgBin, ...a], env)
+}
+const xSync = (pkgBin, a, opts) => (hasBun() ? spawnSync('bun', ['x', '--bun', pkgBin, ...a], opts) : spawnSync(process.platform === 'win32' ? 'npx.cmd' : 'npx', [pkgBin, ...a], opts))
+
 function run(bin, a, env = {}) {
   // no shell: arguments are never interpreted; on Windows the .cmd shims are called by name
   const exe = process.platform === 'win32' && ['npx', 'npm', 'bunx'].includes(bin) ? `${bin}.cmd` : bin
@@ -64,7 +71,6 @@ switch (cmd) {
     break
   }
   case 'dev': {
-    banner()
     if (existsSync(join(cwd, 'app'))) {
       manifest()
       try {
@@ -72,9 +78,16 @@ switch (cmd) {
       } catch {}
     }
     const vite = ['vite.config.ts', 'vite.config.js', 'vite.config.mts'].some((f) => existsSync(join(cwd, f)))
-    if (vite) run('npx', ['vite', ...args.filter((a) => a.startsWith('--'))], { NODE_ENV: 'development' })
-    else if (hasBun()) run('bun', ['--watch', entry()], { NODE_ENV: 'development' })
-    else run('npx', ['tsx', 'watch', entry()], { NODE_ENV: 'development' })
+    if (!vite && !existsSync(join(cwd, entry()))) {
+      console.error(`${red('error[RK0704]')}: no server entry found\n  = help: create server.ts, or run ${y('raiko dev path/to/server.ts')}`)
+      process.exit(1)
+    }
+    console.log(`  ${dim('starting')} ${vite ? 'vite with the Raiko backend' : entry()} ${dim('...')}\n`)
+    const runner = join(dirname(fileURLToPath(import.meta.url)), 'serve-entry.mjs')
+    // everything except the entry file goes to Vite, values included (--port 5174)
+    if (vite) x('vite', args.filter((a) => !/\.(m|c)?(t|j)sx?$/.test(a)), { NODE_ENV: 'development' })
+    else if (hasBun()) run('bun', ['--watch', runner, entry(), 'dev'], { NODE_ENV: 'development' })
+    else x('tsx', ['watch', runner, entry(), 'dev'], { NODE_ENV: 'development' })
     break
   }
   case 'build': {
@@ -83,7 +96,7 @@ switch (cmd) {
     if (existsSync(join(cwd, 'app'))) console.log(`${green('ok')} routes manifest, ${manifest()} files`)
     const vite = ['vite.config.ts', 'vite.config.js', 'vite.config.mts'].some((f) => existsSync(join(cwd, f)))
     if (vite) {
-      const r = spawnSync('npx', ['vite', 'build'], { stdio: 'inherit', env: { ...process.env, NODE_ENV: 'production' } })
+      const r = xSync('vite', ['build'], { stdio: 'inherit', env: { ...process.env, NODE_ENV: 'production' } })
       if (r.status) process.exit(r.status)
       console.log(`${green('ok')} frontend built, minified and mangled, no source maps`)
     }
@@ -91,7 +104,7 @@ switch (cmd) {
     const target = flag('target', hasBun() ? 'bun' : 'node')
     const r = hasBun()
       ? spawnSync('bun', ['build', entry(), '--target', target === 'bun' ? 'bun' : 'node', '--outdir', out, '--minify', '--packages', 'external'], { stdio: 'inherit' })
-      : spawnSync('npx', ['esbuild', entry(), '--bundle', '--platform=node', '--format=esm', '--minify', '--packages=external', `--outdir=${out}`, '--jsx=automatic', '--jsx-import-source=raiko.js'], { stdio: 'inherit' })
+      : xSync('esbuild', [entry(), '--bundle', '--platform=node', '--format=esm', '--minify', '--packages=external', `--outdir=${out}`, '--jsx=automatic', '--jsx-import-source=raiko.js'], { stdio: 'inherit' })
     if (r.status) process.exit(r.status)
     console.log(`${green('ok')} server bundled to .raiko/out ${dim(`(${Date.now() - t0}ms)`)}\n\n  start it with ${y('raiko start')}\n`)
     break
@@ -102,7 +115,7 @@ switch (cmd) {
       console.error(`${red('error[RK0701]')}: no build found\n  = help: run ${y('raiko build')} first`)
       process.exit(1)
     }
-    run(hasBun() ? 'bun' : 'node', [file], { NODE_ENV: 'production' })
+    run(hasBun() ? 'bun' : 'node', [join(dirname(fileURLToPath(import.meta.url)), 'serve-entry.mjs'), file, 'production'], { NODE_ENV: 'production' })
     break
   }
   case 'deploy': {
@@ -112,8 +125,8 @@ switch (cmd) {
       process.exit(1)
     }
     console.log(`\n  deploying to ${y(to)}\n`)
-    if (to === 'vercel') run('npx', ['vercel', '--prod'])
-    else if (to === 'cloudflare') run('npx', ['wrangler', 'deploy'])
+    if (to === 'vercel') x('vercel', ['--prod'])
+    else if (to === 'cloudflare') x('wrangler', ['deploy'])
     else if (to === 'docker') run('docker', ['build', '-t', pkg.name ?? 'raiko-app', '.'])
     else {
       console.error(`${red('error[RK0703]')}: unknown target "${to}"`)

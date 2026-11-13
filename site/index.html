@@ -30,22 +30,21 @@
       <a href="video/">{ T[lang].nav[4] }</a>
     </nav>
     <span class="sp"></span>
-    <label class="sr-only" for="lang">Language</label>
-    <select id="lang" class="btn hide-sm" v-model="lang" v-on:change="setLang(lang)" aria-label="Language"><option value="en">EN</option><option value="es">ES</option><option value="pt">PT</option></select>
-    <button class="btn icon-btn hide-sm" v-on:click="toggleTheme()" aria-label="Toggle theme" data-i="sun"></button>
-    <a class="btn icon-btn hide-sm" href="https://github.com/kwy404/Raiko.js" aria-label="GitHub repository" data-i="branch"></a>
+    <details class="dropdown dropdown-end hide-sm"><summary class="btn" aria-label="Language">{ lang.toUpperCase() }</summary><div class="dropdown-content rk-menu" role="menu"><button role="menuitem" v-on:click="setLang('en')" :class="{ on: lang === 'en' }">English</button><button role="menuitem" v-on:click="setLang('es')" :class="{ on: lang === 'es' }">Español</button><button role="menuitem" v-on:click="setLang('pt')" :class="{ on: lang === 'pt' }">Português</button></div></details>
+    <span class="tooltip tooltip-bottom hide-sm" data-tip="Toggle theme"><button class="btn icon-btn" v-on:click="toggleTheme()" aria-label="Toggle theme" data-i="sun"></button></span>
+    <span class="tooltip tooltip-bottom hide-sm" data-tip="Source on GitHub"><a class="btn icon-btn" href="https://github.com/kwy404/Raiko.js" aria-label="GitHub repository" data-i="branch"></a></span>
     <a class="btn solid" href="docs/">{ T[lang].start }</a>
     <button class="btn icon-btn burger" v-on:click="menu = !menu" :aria-expanded="menu" aria-controls="drawer" aria-label="Menu" data-i="menu"></button>
   </div>
 </header>
-<nav id="drawer" class="drawer" v-show="menu" hidden aria-label="Mobile">
+<nav id="drawer" class="drawer" :hidden="!menu" hidden aria-label="Mobile">
   <a href="docs/" v-on:click="menu = false">{ T[lang].nav[0] }</a>
   <a href="#features" v-on:click="menu = false">{ T[lang].nav[1] }</a>
   <a href="#performance" v-on:click="menu = false">{ T[lang].nav[2] }</a>
   <a href="#compare" v-on:click="menu = false">{ T[lang].nav[3] }</a>
   <a href="video/" v-on:click="menu = false">{ T[lang].nav[4] }</a>
   <a href="https://github.com/kwy404/Raiko.js">GitHub</a>
-  <div style="display:flex;gap:8px;padding-top:16px"><select class="btn" v-model="lang" v-on:change="setLang(lang)" aria-label="Language"><option value="en">EN</option><option value="es">ES</option><option value="pt">PT</option></select><button class="btn" v-on:click="toggleTheme()">Theme</button></div>
+  <div class="drawer-tools"><details class="dropdown dropdown-top "><summary class="btn" aria-label="Language">{ lang.toUpperCase() }</summary><div class="dropdown-content rk-menu" role="menu"><button role="menuitem" v-on:click="setLang('en')" :class="{ on: lang === 'en' }">English</button><button role="menuitem" v-on:click="setLang('es')" :class="{ on: lang === 'es' }">Español</button><button role="menuitem" v-on:click="setLang('pt')" :class="{ on: lang === 'pt' }">Português</button></div></details><button class="btn" v-on:click="toggleTheme()">Theme</button></div>
 </nav>
 
 <main id="main" class="frame">
@@ -59,13 +58,13 @@
     <a class="btn solid lg" href="docs/">{ T[lang].start }</a>
     <a class="btn lg" href="docs/">{ T[lang].learn }</a>
   </div>
-  <div class="cmd"><span><span class="d">$</span> <b>npx create-raiko@latest</b></span><button v-on:click="copy('npx create-raiko@latest')" :aria-label="copied ? 'Copied' : 'Copy command'" data-i="copy"></button></div>
+  <div class="cmd"><span><span class="d">$</span> <b>npx create-raiko@latest</b></span><span class="tooltip" data-tip="Copy"><button v-on:click="copy('npx create-raiko@latest')" aria-label="Copy command" data-i="copy"></button></span></div>
 </section>
 
 <section class="row flush">
   <div class="runtimes">
     <p>{ T[lang].runs }</p>
-    <span class="rt"><i>B</i>Bun</span><span class="rt"><i>N</i>Node.js</span><span class="rt"><i>D</i>Deno</span><span class="rt"><i>W</i>Workers</span><span class="rt"><i>V</i>Vercel</span><span class="rt"><i>D</i>Docker</span>
+    <span class="rt tooltip" data-tip="app.listen() with the native router"><i>B</i>Bun</span><span class="rt tooltip" data-tip="Node 20 and newer"><i>N</i>Node.js</span><span class="rt tooltip" data-tip="Deno.serve, WebSockets included"><i>D</i>Deno</span><span class="rt tooltip" data-tip="export default { fetch }"><i>W</i>Workers</span><span class="rt tooltip" data-tip="one function in api/index.ts"><i>V</i>Vercel</span><span class="rt tooltip" data-tip="non root, multi stage image"><i>D</i>Docker</span>
   </div>
 </section>
 
@@ -308,7 +307,7 @@ export default {
     <div>
       <a class="brand" href="./" style="padding:0"><span class="mark" data-i="bolt"></span><span>Raiko<small>.js</small></span></a>
       <p>{ T[lang].foot.lic }</p>
-      <div class="tools"><select class="btn" v-model="lang" v-on:change="setLang(lang)" aria-label="Language"><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option></select><button class="btn icon-btn" v-on:click="toggleTheme()" aria-label="Toggle theme" data-i="sun"></button></div>
+      <div class="tools"><details class="dropdown dropdown-top "><summary class="btn" aria-label="Language">{ lang.toUpperCase() }</summary><div class="dropdown-content rk-menu" role="menu"><button role="menuitem" v-on:click="setLang('en')" :class="{ on: lang === 'en' }">English</button><button role="menuitem" v-on:click="setLang('es')" :class="{ on: lang === 'es' }">Español</button><button role="menuitem" v-on:click="setLang('pt')" :class="{ on: lang === 'pt' }">Português</button></div></details><span class="tooltip" data-tip="Toggle theme"><button class="btn icon-btn" v-on:click="toggleTheme()" aria-label="Toggle theme" data-i="sun"></button></span></div>
     </div>
     <div><h4>{ T[lang].foot.res }</h4><a href="docs/">Docs</a><a href="docs/errors.html">Error codes</a><a href="#performance">Benchmarks</a><a href="video/">Video</a></div>
     <div><h4>{ T[lang].foot.proj }</h4><a href="https://github.com/kwy404/Raiko.js">GitHub</a><a href="https://www.npmjs.com/package/raiko.js">npm</a><a href="https://github.com/kwy404/Raiko.js/releases">Releases</a><a href="https://github.com/kwy404/Raiko.js/blob/main/SECURITY.md">Security</a></div>
@@ -318,6 +317,7 @@ export default {
 
 <script src="icons.js"></script>
 <script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/monsooncss@0.2.0/dist/monsoon.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/voodoojs@1.1.0/dist/voodoo.full.min.js" defer></script>
 <script src="site.js" defer></script>
 </body>

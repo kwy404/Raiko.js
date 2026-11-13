@@ -33,7 +33,8 @@ async function boot(cwd, entry, env) {
   let log = ''
   p.stdout.on('data', (d) => (log += d))
   p.stderr.on('data', (d) => (log += d))
-  for (let i = 0; i < 100; i++) {
+  // up to 60s: a busy CI machine can take a while to boot a big template
+  for (let i = 0; i < 400; i++) {
     await new Promise((r) => setTimeout(r, 150))
     try {
       await fetch(`http://127.0.0.1:${port}/health`)
@@ -93,6 +94,36 @@ for (const c of combos) {
     } finally {
       s.stop()
     }
+    // the commands people actually type: dev, then build and start
+    const waitFor = async (url, ms = 60000) => {
+      const end = Date.now() + ms
+      while (Date.now() < end) {
+        try {
+          const r = await fetch(url)
+          if (r.status < 500) return r.status
+        } catch {}
+        await new Promise((r) => setTimeout(r, 300))
+      }
+      return 0
+    }
+    const devPort = 4700 + Math.floor(Math.random() * 300)
+    const dev = spawn(BUN, ['run', 'dev', '--port', String(devPort)], { cwd: dir, env: { ...process.env, PORT: String(devPort), AUTH_SECRET: 'x'.repeat(48), DATABASE_URL: c.orm === 'prisma' ? 'file:./e2e.db' : 'e2e.db' }, stdio: 'pipe' })
+    let devLog = ''
+    dev.stdout.on('data', (d) => (devLog += d))
+    dev.stderr.on('data', (d) => (devLog += d))
+    const devStatus = await waitFor(vite ? `http://localhost:${devPort}/` : `http://127.0.0.1:${devPort}/`)
+    dev.kill()
+    step(`bun run dev -> ${devStatus}`, { ok: devStatus === 200 && (vite || /Local:\s+http:\/\/localhost/.test(devLog)), out: devLog.slice(-1500) })
+    step('raiko build', sh(BUN, ['x', 'raiko', 'build'], dir, { NODE_ENV: 'production' }))
+    const startPort = 5200 + Math.floor(Math.random() * 300)
+    const start = spawn(BUN, ['x', 'raiko', 'start'], { cwd: dir, env: { ...process.env, PORT: String(startPort), AUTH_SECRET: 'x'.repeat(48), DATABASE_URL: c.orm === 'prisma' ? 'file:./e2e.db' : 'e2e.db' }, stdio: 'pipe' })
+    let startLog = ''
+    start.stdout.on('data', (d) => (startLog += d))
+    start.stderr.on('data', (d) => (startLog += d))
+    const startStatus = await waitFor(`http://127.0.0.1:${startPort}/health`)
+    const home = startStatus === 200 ? (await fetch(`http://127.0.0.1:${startPort}/`, { headers: { accept: 'text/html' } })).status : 0
+    start.kill()
+    step(`raiko start -> health ${startStatus}, home ${home}`, { ok: startStatus === 200 && home === 200, out: startLog.slice(-1500) })
     results.push({ id: c.id, ok: true, steps })
   } catch (e) {
     results.push({ id: c.id, ok: false, steps, error: String(e.message ?? e) })

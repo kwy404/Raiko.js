@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+- `raiko dev` and `raiko start` start the server themselves and print where to open it (Local and Network URLs), so a project whose entry never called `listen()` no longer sits silent. A busy port fails with error RK0706 and the port to try.
+- `isMain()` compares paths the same way on Windows, macOS and Linux.
+- The CLI runs Vite, tsx, esbuild, Vercel and Wrangler through `bunx` when Bun is installed, so projects work on machines without Node. Arguments like `--port 5174` reach Vite with their values.
+- `bun run dev` in this repository starts an example app.
+- Website: language menu, toasts and tooltips from Monsoon, no sideways scroll at any width, 44 px touch targets, working mobile menu.
+
 ## 1.0.1
 
 - Client: `RaikoClientSocket` accepts a `WebSocket` implementation, so the client works on Node 20 with the ws package (the server never needed one).

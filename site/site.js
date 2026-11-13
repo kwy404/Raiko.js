@@ -1,6 +1,13 @@
 // Runs before Voodoo walks the page (both scripts are defer, this one is second).
 for (const el of document.querySelectorAll('[data-i]')) el.insertAdjacentHTML('afterbegin', window.RK_ICON[el.dataset.i] || '')
 
+// Monsoon's toast manager (monsoon.js); silently skipped if the script did not load
+const toast = (title, o = {}) => window.Monsoon?.toast?.(title, { position: 'bottom-center', duration: 2200, ...o })
+// close language menus when clicking elsewhere
+addEventListener('click', (e) => {
+  for (const d of document.querySelectorAll('details.dropdown[open]')) if (!d.contains(e.target)) d.open = false
+})
+
 const read = (k) => { try { return localStorage.getItem(k) } catch { return null } }
 const write = (k, v) => { try { localStorage.setItem(k, v) } catch {} }
 const nav = (navigator.language || 'en').toLowerCase()
@@ -13,16 +20,27 @@ V.data({
   tab: 0,
   menu: false,
   copied: false,
-  setLang(l) { this.lang = l; document.documentElement.lang = l === 'pt' ? 'pt-BR' : l; write('rk-lang', l) },
+  setLang(l) {
+    this.lang = l
+    document.documentElement.lang = l === 'pt' ? 'pt-BR' : l
+    write('rk-lang', l)
+    for (const d of document.querySelectorAll('details.dropdown[open]')) d.open = false
+    toast({ en: 'English', es: 'Español', pt: 'Português' }[l])
+  },
   toggleTheme() {
     const dark = (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')) === 'dark'
     document.documentElement.dataset.theme = dark ? 'light' : 'dark'
     write('rk-theme', dark ? 'light' : 'dark')
     drawRays()
+    toast(dark ? this.T[this.lang].toast.light : this.T[this.lang].toast.dark)
   },
   copy(text) {
-    const done = () => { this.copied = true; setTimeout(() => (this.copied = false), 1500) }
-    navigator.clipboard?.writeText(text).then(done, () => {})
+    const done = () => {
+      this.copied = true
+      setTimeout(() => (this.copied = false), 1500)
+      toast(this.T[this.lang].toast.copied, { description: text, tone: 'success' })
+    }
+    navigator.clipboard?.writeText(text).then(done, () => toast(this.T[this.lang].toast.failed, { description: this.T[this.lang].toast.failedHelp, tone: 'danger' }))
   },
 })
 

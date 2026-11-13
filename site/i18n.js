@@ -27,6 +27,7 @@ window.RK_T = {
     stat: [['108', 'tests'], ['3.4M', 'fuzz checks'], ['21', 'fixed findings'], ['0', 'runtime dependencies']],
     madeTitle: 'Made with open source by the same author',
     ctaTitle: 'Start building with Raiko.',
+    toast: { copied: 'Copied to clipboard', failed: 'Copy failed', failedHelp: 'Select the command and copy it by hand.', light: 'Light theme', dark: 'Dark theme' },
     foot: { res: 'Resources', proj: 'Project', more: 'More from kwy404', lic: 'MIT License. Made by Alexandre Kohler.' },
   },
   es: {
@@ -57,6 +58,7 @@ window.RK_T = {
     stat: [['108', 'tests'], ['3,4M', 'verificaciones fuzz'], ['21', 'hallazgos corregidos'], ['0', 'dependencias']],
     madeTitle: 'Hecho con open source del mismo autor',
     ctaTitle: 'Empieza a construir con Raiko.',
+    toast: { copied: 'Copiado al portapapeles', failed: 'No se pudo copiar', failedHelp: 'Selecciona el comando y cópialo a mano.', light: 'Tema claro', dark: 'Tema oscuro' },
     foot: { res: 'Recursos', proj: 'Proyecto', more: 'Más de kwy404', lic: 'Licencia MIT. Hecho por Alexandre Kohler.' },
   },
   pt: {
@@ -87,6 +89,7 @@ window.RK_T = {
     stat: [['108', 'testes'], ['3,4M', 'verificações fuzz'], ['21', 'falhas corrigidas'], ['0', 'dependências']],
     madeTitle: 'Feito com open source do mesmo autor',
     ctaTitle: 'Comece a construir com o Raiko.',
+    toast: { copied: 'Copiado', failed: 'Não foi possível copiar', failedHelp: 'Selecione o comando e copie à mão.', light: 'Tema claro', dark: 'Tema escuro' },
     foot: { res: 'Recursos', proj: 'Projeto', more: 'Mais do kwy404', lic: 'Licença MIT. Feito por Alexandre Kohler.' },
   },
 }
