@@ -1,7 +1,7 @@
 // In process throughput: the framework's own fetch handler, no network. Same three routes everywhere.
 import { Raiko } from '../src'
-import { Elysia } from 'elysia'
-import { Hono } from 'hono'
+import { Elysia } from './node_modules/elysia/dist/index.mjs'
+import { Hono } from './node_modules/hono/dist/index.js'
 
 const raiko = new Raiko()
   .get('/', 'Hi')

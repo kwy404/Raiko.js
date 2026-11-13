@@ -22,7 +22,7 @@ async function ready(port: number) {
 }
 const cannon = (url: string, s: number) =>
   new Promise<number>((resolve, reject) => {
-    const p = spawn('node', ['node_modules/autocannon/autocannon.js', '-j', '-c', '32', '-d', String(s), url], { stdio: ['ignore', 'pipe', 'ignore'] })
+    const p = spawn('node', ['bench/node_modules/autocannon/autocannon.js', '-j', '-c', '32', '-d', String(s), url], { stdio: ['ignore', 'pipe', 'ignore'] })
     let out = ''
     p.stdout.on('data', (d) => (out += d))
     p.on('close', () => {

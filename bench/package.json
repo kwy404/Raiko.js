@@ -1,0 +1,11 @@
+{
+  "name": "raiko-bench",
+  "private": true,
+  "type": "module",
+  "description": "Benchmarks only: Raiko.js compared with Elysia, Hono and Next.js. Not part of the package.",
+  "devDependencies": {
+    "elysia": "1.4.30",
+    "hono": "4.13.14",
+    "autocannon": "7.15.0"
+  }
+}

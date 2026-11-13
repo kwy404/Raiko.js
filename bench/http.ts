@@ -27,7 +27,7 @@ async function ready(port: number) {
 
 function cannon(url: string, opts: Record<string, unknown>, seconds: number): Promise<number> {
   return new Promise((resolve, reject) => {
-    const args = ['node_modules/autocannon/autocannon.js', '-j', '-c', '64', '-p', '4', '-d', String(seconds)]
+    const args = ['bench/node_modules/autocannon/autocannon.js', '-j', '-c', '64', '-p', '4', '-d', String(seconds)]
     if (opts.method) args.push('-m', String(opts.method))
     for (const [k, v] of Object.entries((opts.headers as Record<string, string>) ?? {})) args.push('-H', `${k}=${v}`)
     if (opts.body) args.push('-b', String(opts.body))
